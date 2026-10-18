@@ -12,11 +12,6 @@ const state = {
 };
 
 const EMOJI = { butter_chicken: "🍛", beef_tacos: "🌮", bolognese: "🍝", mapo_tofu: "🥢" };
-const METRICS = [
-  { key: "ghg", name: "Greenhouse gas", unit: "kg CO₂e", digits: 1 },
-  { key: "land", name: "Land use", unit: "m²", digits: 1 },
-  { key: "water", name: "Freshwater", unit: "L", digits: 0 },
-];
 
 // ---------- helpers ----------
 function esc(s) {
@@ -204,26 +199,10 @@ function renderResult(r) {
   const el = $("#result");
   el.classList.remove("hidden");
   const b = r.footprint_before, a = r.footprint_after;
-  const pct = b.ghg ? ((a.ghg - b.ghg) / b.ghg) * 100 : 0;
+  const saved = b.ghg - a.ghg;
+  const pct = b.ghg ? (saved / b.ghg) * 100 : 0;
   const cuisine = r.cuisine?.[0]?.[0];
   const pantryUsed = r.swaps.filter((s) => s.in_pantry).length;
-
-  const bars = METRICS.map((m) => {
-    const max = Math.max(b[m.key], a[m.key]) || 1;
-    const d = b[m.key] ? ((a[m.key] - b[m.key]) / b[m.key]) * 100 : 0;
-    const up = d > 0.5;
-    return `
-      <div>
-        <div class="metric-head"><span class="name">${m.name}</span>
-          <span class="delta ${up ? "up" : ""}">${d > 0 ? "+" : ""}${fmt(d, 0)}%</span></div>
-        <div class="bar-pair">
-          <div class="bar"><span>Before</span><div class="track"><div class="fill before" data-w="${(b[m.key] / max) * 100}"></div></div>
-            <span class="val">${fmt(b[m.key], m.digits)} ${m.unit}</span></div>
-          <div class="bar"><span>After</span><div class="track"><div class="fill after ${up ? "up" : ""}" data-w="${(a[m.key] / max) * 100}"></div></div>
-            <span class="val">${fmt(a[m.key], m.digits)} ${m.unit}</span></div>
-        </div>
-      </div>`;
-  }).join("");
 
   const swaps = r.swaps.length ? r.swaps.map((s, i) => `
     <div class="swap" style="animation-delay:${i * 70}ms">
@@ -235,16 +214,20 @@ function renderResult(r) {
       <div class="swap-meta">
         ${s.in_pantry ? '<span class="badge pantry">✓ in your pantry</span>' : ""}
         ${s.user_choice ? '<span class="badge">your pick</span>' : ""}
-        <span class="meter" title="How well it fits the rest of the dish (cosine similarity)">dish fit <span class="m"><i style="width:${Math.max(0, s.fit) * 100}%"></i></span></span>
-        ${r.cuisine_lock && cuisine ? `<span class="meter" title="How close it sits to the ${esc(pretty(cuisine))} cuisine direction">${esc(pretty(cuisine))} fit <span class="m"><i style="width:${Math.max(0, s.cuisine_fit) * 100}%"></i></span></span>` : ""}
-        ${s.proxy ? '<span title="Footprint uses the closest food category">≈ footprint estimate</span>' : ""}
-        ${s.ghg_per_kg == null ? '<span>footprint unknown</span>' : ""}
+        <span class="meter" title="How well it fits the rest of the dish">dish fit <span class="m"><i style="width:${Math.max(0, s.fit) * 100}%"></i></span></span>
+        ${r.cuisine_lock && cuisine ? `<span class="meter" title="How well it fits ${esc(pretty(cuisine))} cooking">${esc(pretty(cuisine))} fit <span class="m"><i style="width:${Math.max(0, s.cuisine_fit) * 100}%"></i></span></span>` : ""}
       </div>
-      ${s.alternatives.length ? `<div class="alts">Also plausible:
+      ${s.alternatives.length ? `<div class="alts">Also works:
         ${s.alternatives.map((alt) => `<button class="alt ${alt.in_pantry ? "pantry" : ""}" data-from="${esc(s.from)}" data-to="${esc(alt.name)}">${alt.in_pantry ? "✓ " : ""}${esc(pretty(alt.name))}</button>`).join("")}
       </div>` : ""}
     </div>`).join("")
     : `<div class="note ok">This dish already fits a ${esc(r.mode)} diet. Nothing to swap. 🎉</div>`;
+
+  const impact = saved > 0.05 ? `
+    <div class="impact">
+      <span class="impact-pct">−${fmt(pct, 0)}% CO₂</span>
+      <span class="muted">${fmt(b.ghg, 1)} → ${fmt(a.ghg, 1)} kg for the whole recipe${saved > 0.5 ? ` · about ${fmt(saved / 0.4, 0)} miles of driving` : ""}</span>
+    </div>` : "";
 
   const nutri = r.nutrient_flags.length ? `
     <div class="note nutri"><h3>🥦 Nutrients to watch <span class="muted small">(not medical advice)</span></h3><ul>
@@ -261,28 +244,13 @@ function renderResult(r) {
       <div class="badges">
         ${cuisine ? `<span class="badge cuisine">${esc(pretty(cuisine))} cuisine</span>` : ""}
         <span class="badge">${esc(r.mode)}</span>
-        <span class="badge">Epicure ${esc(r.model)}</span>
         ${pantryUsed ? `<span class="badge pantry">${pantryUsed} swap${pantryUsed > 1 ? "s" : ""} from your pantry</span>` : ""}
       </div>
-      <div class="hero">
-        <div class="big-pct ${pct > 0 ? "up" : ""}">${pct > 0 ? "+" : "−"}${fmt(Math.abs(pct), 0)}%</div>
-        <div class="hero-label">greenhouse gas for the whole recipe<br>
-          <strong>${fmt(b.ghg, 1)} → ${fmt(a.ghg, 1)} kg CO₂e</strong>
-          ${b.ghg - a.ghg > 0.5 ? `<br>≈ ${fmt((b.ghg - a.ghg) / 0.4, 0)} miles not driven*` : ""}</div>
-      </div>
-      <div class="bars">${bars}</div>
-      ${(a.land > b.land * 1.005 || a.water > b.water * 1.005) ? `<div class="coverage"><strong>Trade-off:</strong> some swaps use more ${a.land > b.land * 1.005 && a.water > b.water * 1.005 ? "land or water" : a.land > b.land * 1.005 ? "land" : "water"} than what they replace (pulses need more land per kg than chicken; nuts like cashews are water-hungry). Tap an alternative swap to compare.</div>` : ""}
-      <div class="coverage">Footprint data covers ${fmt(b.coverage * 100, 0)}% of the recipe by weight (butter, cream, oils and spices aren't in the dataset).
-        ${b.ghg - a.ghg > 0.5 ? "*Using the US EPA estimate of about 0.4 kg CO₂ per mile for a typical passenger car." : ""}</div>
-    </div>
-    <div class="card">
-      <h3 class="section-title">Swaps <span class="muted small">highest impact first</span></h3>
       <div class="swaps">${swaps}</div>
+      ${impact}
     </div>
-    ${nutri || warns ? `<div class="card notes">${nutri}${warns}</div>` : ""}`;
-
-  requestAnimationFrame(() => requestAnimationFrame(() =>
-    el.querySelectorAll(".fill").forEach((f) => { f.style.width = `${f.dataset.w}%`; })));
+    ${nutri || warns ? `<div class="card notes">${nutri}${warns}</div>` : ""}
+    <p class="fineprint">CO₂ uses global averages (Poore &amp; Nemecek 2018); data covers ${fmt(b.coverage * 100, 0)}% of this recipe by weight. Driving comparison uses the US EPA estimate of about 0.4 kg CO₂ per mile.</p>`;
 
   el.querySelectorAll(".alt").forEach((btn) =>
     btn.addEventListener("click", () => { state.overrides[btn.dataset.from] = btn.dataset.to; doRemix(); }));

@@ -240,3 +240,11 @@ textarea:focus, input:focus { outline: 2px solid var(--leaf); outline-offset: 1p
 @media (prefers-reduced-motion: reduce) {
   .bar .fill, .swap { transition: none; animation: none; }
 }
+
+/* compact CO2 summary under the swaps */
+.impact {
+  margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--green-soft);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-size: 14px;
+}
+.impact-pct { font: 700 20px var(--serif); color: var(--green); }
+.fineprint { font-size: 12px; color: var(--muted); margin: 0 4px; }

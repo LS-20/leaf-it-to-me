@@ -125,7 +125,7 @@ CANDIDATES = {
     "meat": PROTEINS,
     "seafood": PROTEINS,
     "broth": ["vegetable_stock"],
-    "fat": ["coconut_oil", "olive_oil", "vegetable_oil"],
+    "fat": ["coconut_oil", "olive_oil", "avocado_oil", "vegetable_oil"],
     "cream": ["coconut_cream", "coconut_milk", "cashew"],
     "yogurt": ["coconut_cream", "cashew"],
     "milk": ["oat_milk", "soy_milk", "almond_milk"],
