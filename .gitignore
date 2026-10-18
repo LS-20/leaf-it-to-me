@@ -1,0 +1,24 @@
+# Secrets: never commit
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# LLM response cache
+cache/
+
+# macOS
+.DS_Store
+
+# Downloaded models (run scripts/download_models.py)
+models/
+
+# Private planning files (not for the public repo)
+PROJECT_CONTEXT.md
+*.pptx
+*.pdf

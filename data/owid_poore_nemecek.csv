@@ -1,0 +1,39 @@
+commodity,ghg_kgco2e_per_kg,land_m2_per_kg,water_l_per_kg
+Apples,0.43,0.63,180.1
+Bananas,0.86,1.93,114.5
+Barley,1.18,1.11,17.1
+Beef (beef herd),99.48,326.21,1451.2
+Beef (dairy herd),33.3,43.24,2714.3
+Beet Sugar,1.81,1.83,217.7
+Berries & Grapes,1.53,2.41,419.6
+Brassicas,0.51,0.55,119.4
+Cane Sugar,3.2,2.04,620.1
+Cassava,1.32,1.81,0
+Cheese,23.88,87.79,5605.2
+Citrus Fruit,0.39,0.86,82.7
+Coffee,28.53,21.62,25.9
+Dark Chocolate,46.65,68.96,540.6
+Eggs,4.67,6.27,577.7
+Fish (farmed),13.63,8.41,3691.3
+Groundnuts,3.23,9.11,1852.3
+Lamb & Mutton,39.72,369.81,1802.8
+Maize,1.7,2.94,215.7
+Milk,3.15,8.95,628.2
+Nuts,0.43,12.96,4133.8
+Oatmeal,2.48,7.6,482.4
+Onions & Leeks,0.5,0.39,14.3
+Other Fruit,1.05,0.89,153.5
+Other Pulses,1.79,15.57,435.7
+Other Vegetables,0.53,0.38,102.5
+Peas,0.98,7.46,396.6
+Pig Meat,12.31,17.36,1795.8
+Potatoes,0.46,0.88,59.1
+Poultry Meat,9.87,12.22,660
+Prawns (farmed),26.87,2.97,3515.4
+Rice,4.45,2.8,2248.4
+Root Vegetables,0.43,0.33,28.4
+Soy milk,0.98,0.66,27.8
+Tofu,3.16,3.52,148.6
+Tomatoes,2.09,0.8,369.8
+Wheat & Rye,1.57,3.85,647.5
+Wine,1.79,1.78,78.9
