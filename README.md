@@ -102,3 +102,4 @@ _(to fill in: embeddings, cosine similarity, prompt-to-JSON with Gemini, life-cy
 - **Epicure** ingredient embeddings: Radzikowski, J. and Chen, J. (2026), *Epicure: Navigating the Emergent Geometry of Food Ingredient Embeddings*, arXiv:2605.22391. KAIKAKU.AI. CC-BY-4.0. Used unmodified, loaded from the published safetensors files.
 - **Footprint data:** Poore, J. and Nemecek, T. (2018), *Reducing food's environmental impacts through producers and consumers*, Science 360:987–992, via Our World in Data (CC-BY-4.0).
 - **Gemini API** (Google) for recipe text and photo parsing.
+- The flavor-graph view is styled after the Epicure team's own explorer at [epicure.kaikaku.ai](https://epicure.kaikaku.ai/).
