@@ -331,3 +331,63 @@ button, .drop, .sample, .alt { -webkit-tap-highlight-color: transparent; touch-a
   .ing-row input { font-size: 16px; } /* stops iOS zooming into inputs */
   textarea, input { font-size: 16px; }
 }
+
+/* ---------- flavor graph (styled after epicure.kaikaku.ai) ---------- */
+:root {
+  --g-bg: #0f110e; --g-line: #3a4036; --g-label-bg: #161915; --g-label: #e9eee4; --lime: #d9f2b4;
+  --grp-protein: #4b8fd8; --grp-dairy: #2fb3a5; --grp-spice: #d6a23c; --grp-vegetable: #4fa35a;
+  --grp-grain: #a87442; --grp-sauce: #8b62c9; --grp-fat: #cf6a42; --grp-fruit: #d35c8f;
+}
+.viz-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.viz-head .section-title { margin: 0; }
+.viz-tabs { display: inline-flex; gap: 2px; padding: 3px; background: var(--bg); border-radius: 999px; border: 1px solid var(--line); }
+.viz-tab { border: 0; background: none; padding: 6px 12px; border-radius: 999px; font: 500 13px var(--sans); color: var(--muted); cursor: pointer; }
+.viz-tab.active { background: var(--lime); color: #1b2414; }
+.viz-wrap { position: relative; border-radius: 16px; overflow: hidden; background: var(--g-bg); border: 1px solid #23271f; }
+#flavorGraph, .viz-wrap #flavorMap { display: block; width: 100%; aspect-ratio: 25 / 16; touch-action: none; }
+.viz-wrap #flavorMap { background: var(--g-bg); }
+.viz-wrap #flavorMap .dot { fill: #9aa597; }
+.viz-wrap #flavorMap .region { fill: #9aa597; }
+.viz-wrap #flavorMap .dish-dot, .viz-wrap #flavorMap .dish-label { fill: var(--g-label); }
+#flavorGraph.hidden, #flavorMap.hidden { display: none; }
+
+.g-edge { stroke: var(--g-line); stroke-linecap: round; transition: opacity .3s; }
+.g-edge.why { stroke: var(--lime); }
+.g-edge.swap { stroke: #6b7166; stroke-dasharray: 5 6; }
+.g-edge.swap.on { stroke: var(--lime); opacity: .8; }
+.g-node { cursor: grab; transition: opacity .3s; }
+.g-node:active { cursor: grabbing; }
+.g-dot { stroke: rgba(255, 255, 255, .55); stroke-width: 1.5; }
+.g-node.focus .g-dot { stroke: var(--lime); stroke-width: 3; filter: drop-shadow(0 0 10px rgba(217, 242, 180, .55)); }
+.g-node.removed .g-dot { fill-opacity: .25; stroke-dasharray: 4 4; }
+.g-node.removed .g-label { text-decoration: line-through; opacity: .7; }
+.g-glyph { fill: #fff; font: 600 18px var(--sans); pointer-events: none; }
+.g-label { fill: var(--g-label); font: 500 14px var(--sans); pointer-events: none; }
+.g-node.focus .g-label { font: 700 17px var(--serif); fill: var(--lime); }
+.g-node.lit:not(.focus):not(.removed) .g-label { fill: var(--lime); }
+.g-label-bg { fill: var(--g-label-bg); stroke: #2a2f27; pointer-events: none; }
+#flavorGraph:has(.g-node.focus) .g-node:not(.lit) { opacity: .7; }
+#flavorGraph:has(.g-node.focus) .g-edge:not(.why):not(.on) { opacity: .45; }
+.grp-protein { fill: var(--grp-protein); background: var(--grp-protein); }
+.grp-dairy { fill: var(--grp-dairy); background: var(--grp-dairy); }
+.grp-spice { fill: var(--grp-spice); background: var(--grp-spice); }
+.grp-vegetable { fill: var(--grp-vegetable); background: var(--grp-vegetable); }
+.grp-grain { fill: var(--grp-grain); background: var(--grp-grain); }
+.grp-sauce { fill: var(--grp-sauce); background: var(--grp-sauce); }
+.grp-fat { fill: var(--grp-fat); background: var(--grp-fat); }
+.grp-fruit { fill: var(--grp-fruit); background: var(--grp-fruit); }
+
+.viz-controls { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 6px; }
+.viz-controls button {
+  width: 32px; height: 32px; border-radius: 50%; border: 1px solid #2f342b; background: #1a1d18; color: var(--g-label);
+  font: 500 16px var(--sans); cursor: pointer;
+}
+.viz-controls button:hover { border-color: var(--lime); }
+.viz-legend { position: absolute; left: 12px; top: 10px; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: #b8c0b2; max-width: 70%; }
+.viz-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.viz-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+@media (max-width: 560px) {
+  #flavorGraph, .viz-wrap #flavorMap { aspect-ratio: 1 / 1; }
+  .g-label { font-size: 17px; }
+  .viz-legend { font-size: 10.5px; max-width: 90%; }
+}

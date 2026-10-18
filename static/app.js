@@ -265,11 +265,25 @@ function renderResult(r) {
       ${impact}
     </div>
     ${r.swaps.length ? `<div class="card map-card">
-      <div class="row-between"><h3 class="section-title">Why these swaps? <span class="muted small">Epicure's flavor map</span></h3>
-        <button class="link small" id="mapZoom">Show whole map</button></div>
-      <div class="map-wrap"><svg id="flavorMap" role="img" aria-label="Map of ingredients; similar ingredients sit close together"></svg></div>
+      <div class="viz-head">
+        <h3 class="section-title">Why these swaps?</h3>
+        <div class="viz-tabs" role="tablist">
+          <button class="viz-tab ${vizState.tab === "graph" ? "active" : ""}" data-viz="graph">Flavor graph</button>
+          <button class="viz-tab ${vizState.tab === "atlas" ? "active" : ""}" data-viz="atlas">Atlas</button>
+        </div>
+      </div>
+      <div class="viz-wrap">
+        <svg id="flavorGraph" class="${vizState.tab === "graph" ? "" : "hidden"}" role="img" aria-label="Flavor graph of your dish"></svg>
+        <svg id="flavorMap" class="${vizState.tab === "atlas" ? "" : "hidden"}" role="img" aria-label="Map of all ingredients"></svg>
+        <div class="viz-controls">
+          <button data-zoom="in" aria-label="Zoom in">+</button>
+          <button data-zoom="out" aria-label="Zoom out">−</button>
+          <button data-zoom="reset" aria-label="Reset view">⟲</button>
+        </div>
+        <div class="viz-legend" id="vizLegend"></div>
+      </div>
       <p class="why" id="whyText"></p>
-      <p class="fineprint">Each dot is one of 1,790 ingredients, placed so that ingredients used in similar recipes sit close together (t-SNE of Epicure embeddings, learned from about 4 million recipes). Swaps are scored on the full 300-dimension embedding, not this 2D picture.</p>
+      <p class="fineprint" id="vizNote"></p>
     </div>` : ""}
     ${nutri || warns ? `<div class="card notes">${nutri}${warns}</div>` : ""}
     <p class="fineprint">CO₂ uses global averages (Poore &amp; Nemecek 2018); data covers ${fmt(b.coverage * 100, 0)}% of this recipe by weight. Driving comparison uses the US EPA estimate of about 0.4 kg CO₂ per mile.</p>`;
@@ -279,19 +293,21 @@ function renderResult(r) {
   el.querySelectorAll(".swap[data-i]").forEach((card) =>
     card.addEventListener("click", () => {
       el.querySelectorAll(".swap").forEach((c) => c.classList.toggle("selected", c === card));
-      drawMap(r, +card.dataset.i);
+      drawViz(r, +card.dataset.i);
       const map = document.querySelector(".map-card");
       const box = map?.getBoundingClientRect();
       if (box && (box.top > window.innerHeight * 0.6 || box.bottom < 0)) map.scrollIntoView({ behavior: "smooth", block: "center" });
     }));
   if (r.swaps.length) {
-    $("#mapZoom").addEventListener("click", () => {
-      mapState.zoomed = !mapState.zoomed;
-      $("#mapZoom").textContent = mapState.zoomed ? "Show whole map" : "Zoom to dish";
-      drawMap(r, mapState.selected);
-    });
-    $("#mapZoom").textContent = mapState.zoomed ? "Show whole map" : "Zoom to dish";
-    drawMap(r, 0);
+    el.querySelectorAll(".viz-tab").forEach((t) => t.addEventListener("click", () => {
+      vizState.tab = t.dataset.viz;
+      el.querySelectorAll(".viz-tab").forEach((x) => x.classList.toggle("active", x === t));
+      $("#flavorGraph").classList.toggle("hidden", vizState.tab !== "graph");
+      $("#flavorMap").classList.toggle("hidden", vizState.tab !== "atlas");
+      drawViz(r, vizState.selected);
+    }));
+    el.querySelectorAll(".viz-controls button").forEach((b) => b.addEventListener("click", () => zoomViz(b.dataset.zoom)));
+    drawViz(r, 0);
   }
   renderPantry();
   if (window.innerWidth < 920 && !renderResult._scrolled) {
@@ -300,6 +316,166 @@ function renderResult(r) {
   }
 }
 
+
+// ---------- flavor graph (force layout of the remixed dish) ----------
+const vizState = { tab: "graph", selected: 0, zoom: 1 };
+const GROUP_LABEL = { protein: "Protein", dairy: "Dairy & egg", spice: "Spice & herb", vegetable: "Vegetable",
+  grain: "Grain", sauce: "Sauce & stock", fat: "Fat & oil", fruit: "Fruit & nut" };
+
+function drawViz(r, sel) {
+  vizState.selected = sel;
+  vizState.zoom = 1;
+  if (vizState.tab === "atlas") {
+    $("#vizLegend").innerHTML = "";
+    $("#vizNote").textContent = "Each dot is one of 1,790 ingredients, placed so that ingredients used in similar recipes sit close together (t-SNE of Epicure embeddings, learned from about 4 million recipes). Swaps are scored on the full 300-dimension embedding, not this 2D picture.";
+    drawMap(r, sel);
+  } else {
+    $("#vizNote").textContent = "Lines join ingredients that Epicure places close together; thicker means closer (cosine similarity). Drag a node to rearrange. Faded nodes are what was removed.";
+    drawGraph(r, sel);
+  }
+}
+
+function zoomViz(how) {
+  const svg = vizState.tab === "graph" ? $("#flavorGraph") : $("#flavorMap");
+  const base = svg.dataset.base?.split(" ").map(Number);
+  if (!base) return;
+  vizState.zoom = how === "reset" ? 1 : Math.min(4, Math.max(0.5, vizState.zoom * (how === "in" ? 1.3 : 1 / 1.3)));
+  const [x, y, w, h] = base, cx = x + w / 2, cy = y + h / 2, nw = w / vizState.zoom, nh = h / vizState.zoom;
+  svg.setAttribute("viewBox", `${cx - nw / 2} ${cy - nh / 2} ${nw} ${nh}`);
+}
+
+function drawGraph(r, sel) {
+  const svg = $("#flavorGraph");
+  if (!svg) return;
+  cancelAnimationFrame(drawGraph._raf);
+  const W = 1000, H = 640;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.dataset.base = `0 0 ${W} ${H}`;
+  svg.replaceChildren();
+
+  const swap = r.swaps[sel];
+  const why = new Set((swap?.why || []).map((w) => w.name));
+  const focusNew = swap?.to, focusOld = swap?.from_epicure;
+  const nodes = r.graph.nodes.map((n, i) => {
+    const a = i * 2.39996, rad = 90 + 26 * i;   // golden-angle spiral start: stable layouts
+    return { ...n, x: W / 2 + Math.cos(a) * rad, y: H / 2 + Math.sin(a) * rad, vx: 0, vy: 0 };
+  });
+  const byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+  const center = byId[focusNew];
+  if (center) { center.fx = W / 2; center.fy = H / 2; }
+  // highlight edges: the selected swap to its "why" ingredients (added if not already linked)
+  const edges = r.graph.edges.map((e) => ({ ...e, s: byId[e.a], t: byId[e.b] })).filter((e) => e.s && e.t);
+  for (const w of why) {
+    if (!byId[w] || !center) continue;
+    if (!edges.some((e) => (e.a === focusNew && e.b === w) || (e.b === focusNew && e.a === w)))
+      edges.push({ a: focusNew, b: w, w: swap.why.find((x) => x.name === w).sim, kind: "pair", s: center, t: byId[w] });
+  }
+  const isWhy = (e) => e.kind === "pair" && ((e.a === focusNew && why.has(e.b)) || (e.b === focusNew && why.has(e.a)));
+  const isFocusSwap = (e) => e.kind === "swap" && e.a === focusOld && e.b === focusNew;
+  const lit = (n) => n.id === focusNew || n.id === focusOld || why.has(n.id);
+
+  // --- draw ---
+  const gE = svgEl("g", {}), gN = svgEl("g", {});
+  svg.append(gE, gN);
+  const eEls = edges.map((e) => {
+    const cls = isFocusSwap(e) ? "g-edge swap on" : e.kind === "swap" ? "g-edge swap" : isWhy(e) ? "g-edge why" : "g-edge";
+    const width = e.kind === "swap" ? 2 : 1 + Math.max(0, e.w - 0.35) * 14;
+    const line = svgEl("line", { class: cls, "stroke-width": isWhy(e) ? width + 1.5 : width });
+    gE.append(line);
+    return line;
+  });
+  const nEls = nodes.map((n) => {
+    const g = svgEl("g", { class: `g-node ${n.kind} ${lit(n) ? "lit" : ""} ${n.id === focusNew ? "focus" : ""}` });
+    const rad = n.id === focusNew ? 26 : n.kind === "new" ? 19 : n.kind === "removed" ? 15 : 16;
+    g.append(svgEl("circle", { r: rad, class: `g-dot grp-${n.group}` }));
+    if (n.kind === "new") g.append(svgEl("text", { class: "g-glyph", "text-anchor": "middle", dy: 5 }, "+"));
+    const label = svgEl("text", { class: "g-label", "text-anchor": "middle", y: rad + 20 }, n.label);
+    const bg = svgEl("rect", { class: "g-label-bg", rx: 6 });
+    g.append(bg, label);
+    gN.append(g);
+    const bb = label.getBBox();
+    bg.setAttribute("x", bb.x - 7); bg.setAttribute("y", bb.y - 3);
+    bg.setAttribute("width", bb.width + 14); bg.setAttribute("height", bb.height + 6);
+    n.r = rad;
+    // drag to rearrange
+    g.addEventListener("pointerdown", (ev) => {
+      ev.preventDefault();
+      g.setPointerCapture(ev.pointerId);
+      const move = (e2) => {
+        const pt = new DOMPoint(e2.clientX, e2.clientY).matrixTransform(svg.getScreenCTM().inverse());
+        n.fx = pt.x; n.fy = pt.y; heat = Math.max(heat, 0.35); loop();
+      };
+      const up = () => { g.removeEventListener("pointermove", move); if (n !== center) { delete n.fx; delete n.fy; } };
+      g.addEventListener("pointermove", move);
+      g.addEventListener("pointerup", up, { once: true });
+    });
+    return g;
+  });
+
+  // --- tiny force simulation ---
+  let heat = 1;
+  const rest = (e) => (e.kind === "swap" ? 150 : Math.min(320, Math.max(150, 160 + 300 * (0.85 - e.w))));
+  function step() {
+    for (let i = 0; i < nodes.length; i++) {
+      const a = nodes[i];
+      for (let j = i + 1; j < nodes.length; j++) {
+        const b = nodes[j];
+        let dx = b.x - a.x, dy = b.y - a.y, d2 = dx * dx + dy * dy + 0.01, d = Math.sqrt(d2);
+        const f = (34000 / d2) * heat;
+        const minD = a.r + b.r + 70;                 // keep labels from colliding
+        const push = d < minD ? (minD - d) * 0.5 : 0;
+        dx /= d; dy /= d;
+        a.vx -= dx * (f + push); a.vy -= dy * (f + push);
+        b.vx += dx * (f + push); b.vy += dy * (f + push);
+      }
+    }
+    for (const e of edges) {
+      const dx = e.t.x - e.s.x, dy = e.t.y - e.s.y, d = Math.hypot(dx, dy) || 1;
+      const k = (e.kind === "swap" ? 0.04 : 0.02 + e.w * 0.04) * heat * (d - rest(e)) / d;
+      e.s.vx += dx * k; e.s.vy += dy * k; e.t.vx -= dx * k; e.t.vy -= dy * k;
+    }
+    for (const n of nodes) {
+      n.vx += (W / 2 - n.x) * 0.0008 * heat; n.vy += (H / 2 - n.y) * 0.004 * heat;
+      n.vx *= 0.55; n.vy *= 0.55;
+      if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = n.vy = 0; continue; }
+      n.x = Math.min(W - 50, Math.max(50, n.x + n.vx));
+      n.y = Math.min(H - 40, Math.max(40, n.y + n.vy));
+    }
+    heat *= 0.985;
+  }
+  function paint() {
+    edges.forEach((e, i) => {
+      eEls[i].setAttribute("x1", e.s.x); eEls[i].setAttribute("y1", e.s.y);
+      eEls[i].setAttribute("x2", e.t.x); eEls[i].setAttribute("y2", e.t.y);
+    });
+    nodes.forEach((n, i) => nEls[i].setAttribute("transform", `translate(${n.x},${n.y})`));
+  }
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function loop() {
+    cancelAnimationFrame(drawGraph._raf);
+    const tick = () => {
+      for (let i = 0; i < 3; i++) step();
+      paint();
+      if (heat > 0.02) drawGraph._raf = requestAnimationFrame(tick);
+    };
+    tick();
+  }
+  if (reduce) { while (heat > 0.02) step(); paint(); } else loop();
+
+  // legend: only groups present
+  const groups = [...new Set(nodes.map((n) => n.group))];
+  $("#vizLegend").innerHTML = groups.map((g) => `<span><i class="grp-${g}"></i>${GROUP_LABEL[g] || g}</span>`).join("");
+  writeWhy(r, sel);
+}
+
+function writeWhy(r, sel) {
+  const s = r.swaps[sel];
+  if (!s) return;
+  const why = (s.why || []).map((w) => `<strong>${esc(pretty(w.name))}</strong>`);
+  const list = why.length > 1 ? `${why.slice(0, -1).join(", ")} and ${why[why.length - 1]}` : why.join("");
+  $("#whyText").innerHTML = `<span class="to-word">${esc(pretty(s.to))}</span> replaces ${esc(s.from)} because Epicure links it closely with ${list}, which are already in your dish.${
+    r.cuisine_lock && r.cuisine?.[0] ? ` It also leans ${esc(pretty(r.cuisine[0][0]))}, like the rest of the dish.` : ""}`;
+}
 
 // ---------- flavor map ----------
 const mapState = { data: null, index: null, zoomed: true, selected: 0 };
@@ -349,6 +525,7 @@ async function drawMap(r, sel) {
     vb = [x0, y0, x1 - x0, y1 - y0];
   }
   svg.setAttribute("viewBox", vb.join(" "));
+  svg.dataset.base = vb.join(" ");
   const k = vb[2] / W; // scale so dots/labels keep a constant on-screen size
   svg.replaceChildren();
 
@@ -392,11 +569,7 @@ async function drawMap(r, sel) {
     }
   }
 
-  const s = r.swaps[sel];
-  const why = (s.why || []).map((w) => `<strong>${esc(pretty(w.name))}</strong>`);
-  const list = why.length > 1 ? `${why.slice(0, -1).join(", ")} and ${why[why.length - 1]}` : why.join("");
-  $("#whyText").innerHTML = s ? `<span class="to-word">${esc(pretty(s.to))}</span> replaces ${esc(s.from)} because Epicure links it closely with ${list}, which are already in your dish.${
-    r.cuisine_lock && r.cuisine?.[0] ? ` It also leans ${esc(pretty(r.cuisine[0][0]))}, like the rest of the dish.` : ""}` : "";
+  writeWhy(r, sel);
 }
 
 // ---------- accuracy card ----------

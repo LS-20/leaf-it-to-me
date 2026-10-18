@@ -44,6 +44,40 @@ def rank_swaps(original, context_vec, cuisine_vec, mode, emb, pantry=()):
     return sorted(out, key=lambda c: -c["score"])
 
 
+def build_graph(emb, after, swaps, k=3, min_w=0.35):
+    """Flavor graph of the remixed dish.
+
+    Nodes: ingredients after the remix (kept + new) and the removed originals.
+    Edges: each node links to its k most similar dish ingredients (cosine, Epicure),
+    plus a 'swap' edge from each removed ingredient to its replacement.
+    """
+    names = list(dict.fromkeys(a["epicure"] for a in after if a.get("epicure") in emb))
+    new_of = {s["to"]: i for i, s in enumerate(swaps)}
+    nodes = [{"id": n, "label": n.replace("_", " "), "group": C.group_of(n),
+              "kind": "new" if n in new_of else "kept", "swap": new_of.get(n)} for n in names]
+    for i, s in enumerate(swaps):
+        if s["from_epicure"] in emb and s["from_epicure"] not in names:
+            nodes.append({"id": s["from_epicure"], "label": s["from_epicure"].replace("_", " "),
+                          "group": C.group_of(s["from_epicure"]), "kind": "removed", "swap": i})
+    if not names:
+        return {"nodes": nodes, "edges": []}
+    V = emb.E[[emb.index[n] for n in names]]
+    S = V @ V.T
+    edges = {}
+    for a in range(len(names)):
+        order = [b for b in S[a].argsort()[::-1] if b != a][:k]
+        for b in order:
+            w = float(S[a, b])
+            if w >= min_w:
+                key = tuple(sorted((names[a], names[b])))
+                edges[key] = round(w, 3)
+    out = [{"a": a, "b": b, "w": w, "kind": "pair"} for (a, b), w in edges.items()]
+    for s in swaps:
+        if s["from_epicure"] in emb:
+            out.append({"a": s["from_epicure"], "b": s["to"], "w": 1.0, "kind": "swap"})
+    return {"nodes": nodes, "edges": out}
+
+
 def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=(),
           overrides=None):
     """pantry: free-text names the user owns. overrides: {original_name: chosen_swap}."""
@@ -117,6 +151,7 @@ def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=(),
         "cuisine": cuisines[:3], "cuisine_lock": cuisine_lock,
         "pantry_matched": sorted(pantry_set),
         "dish_epicure": sorted(set(keep)),
+        "graph": build_graph(emb, after, swaps),
         "before": items, "after": after, "swaps": swaps,
         "footprint_before": before_fp, "footprint_after": after_fp,
         "nutrient_flags": [{"nutrient": n, "lost_from": v, "tip": C.NUTRIENT_TIPS.get(n, "")}

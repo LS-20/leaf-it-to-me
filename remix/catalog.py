@@ -213,3 +213,32 @@ NUTRIENT_TIPS = {
     "vitamin D": "fortified plant milk or sunlight",
     "choline": "soy, beans and broccoli supply some choline",
 }
+
+
+# --- Display groups (only for coloring the flavor graph) -------------------
+GROUPS = ["protein", "dairy", "spice", "vegetable", "grain", "sauce", "fat", "fruit"]
+_PROTEIN_WORDS = re.compile(r"(bean|lentil|chickpea|dal\b|_dal|tofu|tempeh|edamame|seitan)")
+_FAT_WORDS = re.compile(r"(oil$|^butter$|ghee|lard|margarine|shortening)")
+_DAIRY_WORDS = re.compile(r"(milk|cream|cheese|yogurt|curd|paneer|^egg)")
+_GRAIN_WORDS = re.compile(r"(rice|pasta|spaghetti|noodle|tortilla|bread|flour|oat|quinoa|couscous|naan|pita|bun$|cornmeal|cornstarch)")
+_SAUCE_WORDS = re.compile(r"(sauce|paste|stock|broth|vinegar|wine|doubanjiang|miso|ketchup|mustard|mayonnaise|salsa|gochujang|mirin|sake|syrup|honey|sugar)")
+_SPICE_WORDS = re.compile(r"(masala|powder|seed|peppercorn|_leaf|leaves|cumin|turmeric|paprika|cinnamon|clove|cardamom|basil|oregano|thyme|parsley|dill|coriander|cilantro|chili|black_pepper|saffron|nutmeg|bay|rosemary|sage|mint|ginger|anise|amchur|asafoetida|ajwain|methi|salt)")
+_FRUIT_WORDS = re.compile(r"(lime|lemon|orange|mango|jackfruit|avocado|apple|pear|coconut|cashew|almond|peanut|walnut|pistachio|pecan|hazelnut|raisin|date|berry|grape|banana|pineapple|tamarind|nut$)")
+
+
+def group_of(name: str) -> str:
+    if ROLE.get(name) in ("meat", "seafood") or name in PROTEINS or _PROTEIN_WORDS.search(name):
+        return "protein"
+    if _FAT_WORDS.search(name):
+        return "fat"
+    if _DAIRY_WORDS.search(name) and not name.startswith("coconut"):
+        return "dairy"
+    if _GRAIN_WORDS.search(name):
+        return "grain"
+    if _SAUCE_WORDS.search(name):
+        return "sauce"
+    if _SPICE_WORDS.search(name):
+        return "spice"
+    if _FRUIT_WORDS.search(name):
+        return "fruit"
+    return "vegetable"
