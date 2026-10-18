@@ -26,7 +26,8 @@ pip install -r requirements.txt
 python scripts/download_models.py          # Epicure embeddings (~13 MB)
 cp .env.example .env                       # then paste your Gemini key (aistudio.google.com)
 
-python cli.py --sample butter_chicken --mode vegan    # no API key needed
+.venv/bin/uvicorn server:app --reload       # web app at http://localhost:8000
+python cli.py --sample butter_chicken --mode vegan    # command line, no API key needed
 python cli.py --text "1 lb ground beef, 8 corn tortillas, 1 onion, ..." --mode vegetarian
 python cli.py --photo my_recipe.jpg --mode vegan
 pytest -q                                   # diet-rule tests
@@ -70,8 +71,7 @@ flowchart LR
 
 ## What's next
 
-- Web app (mobile-first) on Vultr with our GoDaddy domain
-- **Pantry photo mode:** photograph your shelf; swaps you already own rank higher, so less food goes to waste
+- Deploy the web app to a public URL with our GoDaddy domain
 - Fill footprint gaps (butter, cream, oils) with k-NN imputation over Epicure embeddings, tested against held-out ingredients
 - "How far" slider, allergen warnings, and the Core / Cooc / Chem model dial in the UI
 

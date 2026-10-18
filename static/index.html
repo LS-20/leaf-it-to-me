@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recipe Remix</title>
+<meta name="description" content="Same dish, lighter footprint: cuisine-aware plant-based swaps for your recipe, using what's in your pantry.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">🌱</span>
+    <div>
+      <h1>Recipe Remix</h1>
+      <p class="tag">Same dish, lighter footprint, still itself.</p>
+    </div>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- ============ INPUT COLUMN ============ -->
+  <section class="col inputs" aria-label="Your recipe">
+
+    <div class="card step">
+      <div class="step-head"><span class="num">1</span><h2>Your recipe</h2></div>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="samples" role="tab">Try a dish</button>
+        <button class="tab" data-tab="paste" role="tab">Paste</button>
+        <button class="tab" data-tab="photo" role="tab">Photo</button>
+      </div>
+
+      <div class="tabpane" id="tab-samples">
+        <div class="samples" id="samples"></div>
+      </div>
+
+      <div class="tabpane hidden" id="tab-paste">
+        <textarea id="pasteText" rows="6" placeholder="Paste a recipe or just the ingredient list…&#10;e.g. 1 lb ground beef, 8 corn tortillas, 1 onion, 1 cup shredded cheddar"></textarea>
+        <button class="btn secondary" id="pasteBtn">Read recipe with Gemini</button>
+      </div>
+
+      <div class="tabpane hidden" id="tab-photo">
+        <label class="drop" for="recipePhoto">
+          <span class="drop-icon" aria-hidden="true">📷</span>
+          <span><strong>Snap or upload</strong> a recipe card or cookbook page</span>
+          <input type="file" id="recipePhoto" accept="image/*" capture="environment" hidden>
+        </label>
+      </div>
+
+      <div id="ingredientsBox" class="hidden">
+        <div class="row-between">
+          <input id="dishTitle" class="title-input" aria-label="Dish name">
+          <span class="muted small" id="ingCount"></span>
+        </div>
+        <p class="muted small">Check the list. Fix anything that was misread.</p>
+        <div class="ing-table" id="ingTable"></div>
+        <button class="link" id="addIng">+ Add ingredient</button>
+      </div>
+    </div>
+
+    <div class="card step">
+      <div class="step-head"><span class="num">2</span><h2>Your pantry <span class="opt">optional</span></h2></div>
+      <p class="muted small">Show us your shelf. Swaps you already own get ranked first, so you buy less and waste less.</p>
+      <label class="drop compact" for="pantryPhoto">
+        <span class="drop-icon" aria-hidden="true">🥫</span>
+        <span><strong>Snap your pantry</strong> or fridge</span>
+        <input type="file" id="pantryPhoto" accept="image/*" capture="environment" hidden>
+      </label>
+      <div class="chips" id="pantryChips"></div>
+      <form class="chip-add" id="pantryForm">
+        <input id="pantryInput" placeholder="or type an item, e.g. chickpeas" aria-label="Add pantry item">
+        <button class="btn small secondary" type="submit">Add</button>
+      </form>
+    </div>
+
+    <div class="card step">
+      <div class="step-head"><span class="num">3</span><h2>How plant-forward?</h2></div>
+      <div class="segmented" id="modeSeg" role="radiogroup" aria-label="Diet mode">
+        <button data-mode="flexitarian" role="radio">Flexitarian<small>swap beef &amp; lamb</small></button>
+        <button data-mode="vegetarian" role="radio">Vegetarian<small>no meat or fish</small></button>
+        <button data-mode="vegan" class="active" role="radio">Vegan<small>fully plant-based</small></button>
+      </div>
+      <details class="advanced">
+        <summary>Model settings</summary>
+        <div class="adv-row">
+          <span>Epicure model</span>
+          <div class="segmented mini" id="modelSeg">
+            <button data-model="core" class="active" title="Co-occurrence + flavor chemistry">Core</button>
+            <button data-model="cooc" title="Which ingredients appear together in recipes">Cooc</button>
+            <button data-model="chem" title="Shared flavor compounds">Chem</button>
+          </div>
+        </div>
+        <label class="adv-row toggle">
+          <span>Cuisine lock <small class="muted">keep swaps inside the dish's cuisine</small></span>
+          <input type="checkbox" id="cuisineLock" checked>
+        </label>
+      </details>
+      <button class="btn primary big" id="remixBtn" disabled>Remix it →</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS COLUMN ============ -->
+  <section class="col results" aria-live="polite" aria-label="Results">
+    <div class="card empty" id="emptyState">
+      <div class="empty-art" aria-hidden="true">🍛 → 🌱</div>
+      <h2>Pick a dish to begin</h2>
+      <p class="muted">We'll find plant-based swaps that fit its cuisine, show how much carbon, land and water you save, and flag anything to watch.</p>
+    </div>
+    <div id="result" class="hidden"></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Swaps are <em>plausible</em> pairings from ingredient co-occurrence and flavor chemistry, not taste-tested. Footprints are global averages. Nutrition notes are not medical advice.</p>
+  <p>Built with <a href="https://huggingface.co/Kaikaku/epicure-core" target="_blank" rel="noopener">Epicure</a> (Radzikowski &amp; Chen, KAIKAKU.AI, CC-BY-4.0) ·
+  footprint data from Poore &amp; Nemecek (2018) via <a href="https://ourworldindata.org/environmental-impacts-of-food" target="_blank" rel="noopener">Our World in Data</a> · recipe and photo reading by Gemini.</p>
+</footer>
+
+<div class="toast hidden" id="toast" role="status"></div>
+<div class="loading hidden" id="loading"><div class="spinner"></div><span id="loadingText">Working…</span></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

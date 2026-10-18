@@ -44,9 +44,17 @@ def rank_swaps(original, context_vec, cuisine_vec, mode, emb, pantry=()):
     return sorted(out, key=lambda c: -c["score"])
 
 
-def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=()):
+def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=(),
+          overrides=None):
+    """pantry: free-text names the user owns. overrides: {original_name: chosen_swap}."""
     emb = load(model)
     vocab = emb.names
+    overrides = overrides or {}
+    pantry_set = set()
+    for p in pantry:
+        e = map_name(p, vocab)["epicure"]
+        if e:
+            pantry_set.add(e)
     items = []
     for ing in recipe["ingredients"]:
         m = map_name(ing["name"], vocab)
@@ -72,11 +80,14 @@ def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=()):
     # Highest-impact first (grams x CO2e/kg).
     to_swap.sort(key=lambda i: -(i["grams"] * (i["footprint"] or {}).get("ghg", 0)))
     for it in to_swap:
-        ranked = rank_swaps(it["epicure"], context_vec, cuisine_vec, mode, emb, pantry)
+        ranked = rank_swaps(it["epicure"], context_vec, cuisine_vec, mode, emb, pantry_set)
         if not ranked:
             warnings.append(f"No allowed swap found for {it['name']}: remove it or check a specialty product.")
             continue
         best = ranked[0]
+        chosen = overrides.get(it["name"])
+        if chosen:
+            best = next((c for c in ranked if c["name"] == chosen), best)
         role = C.role_of(it["epicure"])
         for n in C.NUTRIENT_FLAGS.get(role, []):
             nutrients.setdefault(n, []).append(it["name"])
@@ -87,7 +98,8 @@ def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=()):
                          swapped_from=it["name"])
         swaps.append({"from": it["name"], "from_epicure": it["epicure"],
                       "grams": it["grams"], "role": role,
-                      "to": best["name"], "alternatives": ranked[1:4], **best})
+                      "to": best["name"], "alternatives": [c for c in ranked if c["name"] != best["name"]][:4],
+                      "user_choice": best is not ranked[0], **best})
 
     for a in after:
         if a["diet"] == C.CHECK and a["epicure"] and C.check_concerns(a["epicure"], mode):
@@ -99,6 +111,7 @@ def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=()):
     return {
         "title": recipe.get("title", "Your recipe"), "mode": mode, "model": model,
         "cuisine": cuisines[:3], "cuisine_lock": cuisine_lock,
+        "pantry_matched": sorted(pantry_set),
         "before": items, "after": after, "swaps": swaps,
         "footprint_before": before_fp, "footprint_after": after_fp,
         "nutrient_flags": [{"nutrient": n, "lost_from": v, "tip": C.NUTRIENT_TIPS.get(n, "")}
