@@ -140,7 +140,7 @@ function renderPantry() {
   $("#pantryChips").innerHTML = state.pantry.map((p, k) => `
     <span class="chip">${esc(p)}<button data-k="${k}" aria-label="Remove ${esc(p)}">×</button></span>`).join("");
   document.querySelectorAll("#pantryChips button").forEach((b) =>
-    b.addEventListener("click", () => { state.pantry.splice(+b.dataset.k, 1); renderPantry(); rerun(); }));
+    b.addEventListener("click", () => { state.pantry.splice(+b.dataset.k, 1); renderPantry(); renderPhotoCount(); rerun(); }));
 }
 function addPantry(items) {
   const seen = new Set(state.pantry.map((p) => p.toLowerCase()));
@@ -154,16 +154,31 @@ $("#pantryForm").addEventListener("submit", (e) => {
   $("#pantryInput").value = "";
 });
 $("#pantryPhoto").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  loading(true, "Gemini is looking at your pantry…");
-  try {
-    const { items } = await uploadPhoto(file, "pantry");
-    if (!items.length) toast("Couldn't spot any food in that photo.");
-    else toast(`Found ${items.length} items in your pantry.`);
-    addPantry(items);
-  } catch (err) { toast(err.message); } finally { loading(false); e.target.value = ""; }
+  const files = [...e.target.files].slice(0, 10);
+  e.target.value = "";
+  if (!files.length) return;
+  loading(true, files.length > 1 ? `Gemini is looking at ${files.length} photos…` : "Gemini is looking at your pantry…");
+  // Read every photo in parallel; one bad photo doesn't sink the rest.
+  const results = await Promise.allSettled(files.map((f) => uploadPhoto(f, "pantry")));
+  loading(false);
+  const ok = results.filter((r) => r.status === "fulfilled");
+  const before = state.pantry.length;
+  addPantry(ok.flatMap((r) => r.value.items));
+  state.pantryPhotos = (state.pantryPhotos || 0) + ok.length;
+  const added = state.pantry.length - before;
+  const failed = results.length - ok.length;
+  renderPhotoCount();
+  toast(`${ok.length ? `Found ${added} new item${added === 1 ? "" : "s"} in ${ok.length} photo${ok.length === 1 ? "" : "s"}.` : ""}${
+    failed ? ` ${failed} photo${failed === 1 ? "" : "s"} couldn't be read.` : ""}`.trim() || "Couldn't spot any food in that photo.");
 });
+function renderPhotoCount() {
+  const n = state.pantryPhotos || 0;
+  const el = $("#photoCount");
+  el.classList.toggle("hidden", !n);
+  el.innerHTML = n ? `${sprite("camera", 18)}<span>${n} photo${n === 1 ? "" : "s"} scanned · ${state.pantry.length} item${state.pantry.length === 1 ? "" : "s"} in your pantry</span>
+    <button class="link small" id="clearPantry">Clear</button>` : "";
+  $("#clearPantry")?.addEventListener("click", () => { state.pantry = []; state.pantryPhotos = 0; renderPantry(); renderPhotoCount(); rerun(); });
+}
 
 // ---------- step 3: settings ----------
 function segmented(sel, attr, key) {

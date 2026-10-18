@@ -74,9 +74,10 @@
       <p class="muted small">Show us your shelf. Swaps you already own get ranked first, so you buy less and waste less.</p>
       <label class="drop compact" for="pantryPhoto">
         <span class="drop-icon" data-sprite="can"></span>
-        <span><strong>Snap your pantry</strong> or fridge</span>
-        <input type="file" id="pantryPhoto" accept="image/*" capture="environment" hidden>
+        <span><strong>Snap your pantry, fridge &amp; shelves</strong><br><small class="muted">Add as many photos as you like</small></span>
+        <input type="file" id="pantryPhoto" accept="image/*" multiple hidden>
       </label>
+      <div class="photo-count hidden" id="photoCount"></div>
       <div class="chips" id="pantryChips"></div>
       <form class="chip-add" id="pantryForm">
         <input id="pantryInput" placeholder="or type an item, e.g. chickpeas" aria-label="Add pantry item">

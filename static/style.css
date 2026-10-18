@@ -511,3 +511,6 @@ textarea, input:not([type]), input[type=text], input[type=number] { border: 2px 
 
 .toast { border: 3px solid var(--bg); font-weight: 700; }
 .spinner { border-radius: 0; border-width: 4px; animation: spin 1s steps(8) infinite; }
+.photo-count { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; margin: 4px 0 8px; }
+.photo-count .px { flex: none; }
+.photo-count .link { margin-left: auto; }
