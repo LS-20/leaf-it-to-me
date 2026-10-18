@@ -1,5 +1,5 @@
 // Service worker: keeps the app shell and demo data available offline.
-const CACHE = "remix-v2";
+const CACHE = "leafit-v3";
 const SHELL = ["/", "/static/style.css", "/static/app.js", "/static/sprites.js", "/static/manifest.webmanifest",
   "/static/icons/icon-192.png", "/api/samples", "/api/flavor-map", "/api/benchmark"];
 

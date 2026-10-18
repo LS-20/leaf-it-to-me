@@ -1,4 +1,4 @@
-# Recipe Remix API
+# Leaf It To Me API
 
 All app logic lives on the server, so any client (the web app, or a future SwiftUI app) is just screens on top of these endpoints. JSON in, JSON out.
 

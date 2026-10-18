@@ -1,10 +1,10 @@
-# Recipe Remix (working title)
+# Leaf It To Me
 
 **Same dish, lighter footprint, still itself.**
 
 Paste a recipe (or photograph it), pick a diet mode, and get a lower-carbon version that stays inside the dish's cuisine, with a before/after footprint and nutrition warnings.
 
-Most "go plant-based" tools say "swap beef for tofu" no matter what you're cooking. Recipe Remix uses **Epicure**, an open ingredient-embedding model trained on about 4.14 million recipes, to rank plant swaps by how well they fit *this* dish and *its* cuisine:
+Most "go plant-based" tools say "swap beef for tofu" no matter what you're cooking. Leaf It To Me uses **Epicure**, an open ingredient-embedding model trained on about 4.14 million recipes, to rank plant swaps by how well they fit *this* dish and *its* cuisine:
 
 | Dish | Replaces | Top-ranked swap | CO2e change (vegan mode) |
 |---|---|---|---|
@@ -66,8 +66,8 @@ We hand-labelled 31 meat dishes across 7 cuisines with the plant protein their w
 
 | Method | Hit@1 | Hit@3 |
 |---|---|---|
-| **Recipe Remix** (dish context + cuisine lock) | **81%** | 90% |
-| Recipe Remix without cuisine lock | 74% | 94% |
+| **Leaf It To Me** (dish context + cuisine lock) | **81%** | 90% |
+| Leaf It To Me without cuisine lock | 74% | 94% |
 | Closest plant protein to the meat itself | 48% | 68% |
 | "Just use tofu" | 32% | 81% |
 | Random | 15% | 40% |

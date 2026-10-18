@@ -17,7 +17,7 @@ from remix.swap import remix
 
 ROOT = Path(__file__).resolve().parent
 MAX_UPLOAD = 15 * 1024 * 1024
-app = FastAPI(title="Recipe Remix")
+app = FastAPI(title="Leaf It To Me")
 
 
 class Ingredient(BaseModel):

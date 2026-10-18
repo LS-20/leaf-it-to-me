@@ -1,4 +1,4 @@
-// Recipe Remix front end: plain JS, no build step.
+// Leaf It To Me front end: plain JS, no build step.
 const $ = (sel) => document.querySelector(sel);
 
 const state = {
@@ -16,7 +16,7 @@ const SAMPLE_SPRITE = { butter_chicken: "curry", beef_tacos: "taco", bolognese: 
 function paintSprites(root = document) {
   root.querySelectorAll("[data-sprite]").forEach((el) => { el.innerHTML = sprite(el.dataset.sprite, +(el.dataset.size || 36)); });
 }
-$("#logo").innerHTML = sprite("sprout", 44, "Recipe Remix");
+$("#logo").innerHTML = sprite("sprout", 44, "Leaf It To Me");
 paintSprites();
 
 // ---------- helpers ----------
@@ -655,7 +655,7 @@ async function loadBenchmark() {
   const all = await api("/api/benchmark");
   const r = all.core;
   const rows = [
-    ["Recipe Remix", r.summary.ours_cuisine_lock, "ours"],
+    ["Leaf It To Me", r.summary.ours_cuisine_lock, "ours"],
     ["Closest match to the meat", r.summary.nearest_to_meat, ""],
     ['"Just use tofu"', r.summary.always_tofu, ""],
     ["Random pick", r.summary.random, ""],
