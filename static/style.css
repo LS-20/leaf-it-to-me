@@ -310,9 +310,24 @@ textarea:focus, input:focus { outline: 2px solid var(--leaf); outline-offset: 1p
 .recipe .alts { margin-top: 8px; }
 .see-why { color: var(--green); font-weight: 600; opacity: 0; transition: opacity .15s; }
 .line.swap:hover .see-why, .line.swap.selected .see-why { opacity: 1; }
-.tag {
+.pill {
   font: 600 11px var(--sans); letter-spacing: .02em; text-transform: uppercase; padding: 2px 7px;
   border-radius: 5px; background: var(--bg); color: var(--muted); align-self: center;
 }
-.tag.pantry-tag { background: var(--green); color: var(--card); }
-.tag.warn-tag { background: var(--clay-soft); color: var(--clay); margin-left: 8px; }
+.pill.pantry-tag { background: var(--green); color: var(--card); }
+.pill.warn-tag { background: var(--clay-soft); color: var(--clay); margin-left: 8px; }
+
+/* ---------- app-like on phones ---------- */
+.logo { width: 40px; height: 40px; border-radius: 10px; }
+button, .drop, .sample, .alt { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+@media (max-width: 919px) {
+  body { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+  .top { padding-top: calc(16px + env(safe-area-inset-top)); }
+  #remixBtn {
+    position: fixed; left: 16px; right: 16px; bottom: calc(12px + env(safe-area-inset-bottom));
+    width: auto; margin: 0; z-index: 5; box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  }
+  .alt { padding: 7px 12px; }
+  .ing-row input { font-size: 16px; } /* stops iOS zooming into inputs */
+  textarea, input { font-size: 16px; }
+}

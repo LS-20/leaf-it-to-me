@@ -102,6 +102,13 @@ def do_remix(req: RemixRequest):
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
 
+@app.get("/sw.js")
+def service_worker():
+    # Served from the root so it can control the whole app.
+    return FileResponse(ROOT / "static" / "sw.js", media_type="text/javascript",
+                        headers={"Cache-Control": "no-cache"})
+
+
 @app.get("/")
 def index():
     return FileResponse(ROOT / "static" / "index.html")

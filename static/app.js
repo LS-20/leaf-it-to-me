@@ -211,7 +211,7 @@ function renderResult(r) {
     const check = r.after[k]?.diet === "check" && r.mode !== "flexitarian";
     if (!hit) {
       return `<li class="line"><span class="qty">${fmt(it.grams, 0)} g</span>
-        <span class="ing">${esc(it.name)}</span>${check ? '<span class="tag warn-tag" title="Processed item: may hide animal ingredients">check label</span>' : ""}</li>`;
+        <span class="ing">${esc(it.name)}</span>${check ? '<span class="pill warn-tag" title="Processed item: may hide animal ingredients">check label</span>' : ""}</li>`;
     }
     const { s, i } = hit;
     return `<li class="line swap ${i === 0 ? "selected" : ""}" data-i="${i}" style="animation-delay:${i * 80}ms">
@@ -220,8 +220,8 @@ function renderResult(r) {
         <div class="swap-main">
           <span class="from">${esc(s.from)}</span>
           <span class="to">${esc(pretty(s.to))}</span>
-          ${s.in_pantry ? '<span class="tag pantry-tag">in your pantry</span>' : ""}
-          ${s.user_choice ? '<span class="tag">your pick</span>' : ""}
+          ${s.in_pantry ? '<span class="pill pantry-tag">in your pantry</span>' : ""}
+          ${s.user_choice ? '<span class="pill">your pick</span>' : ""}
         </div>
         <div class="swap-meta">
           <span class="meter" title="How well it fits the rest of the dish">dish fit <span class="m"><i style="width:${Math.max(0, s.fit) * 100}%"></i></span></span>
