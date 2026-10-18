@@ -75,7 +75,7 @@ struct ContentView: View {
             stepHead(1, "Your recipe", .pink)
             HStack(spacing: 6) {
                 tabButton("samples", "Try a dish")
-                tabButton("paste", "Paste")
+                tabButton("paste", "Text")
                 tabButton("photo", "Photo")
             }
             switch tab {
