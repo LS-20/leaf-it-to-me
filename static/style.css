@@ -362,8 +362,8 @@ button, .drop, .sample, .alt { -webkit-tap-highlight-color: transparent; touch-a
 .g-node.removed .g-dot { fill-opacity: .25; stroke-dasharray: 4 4; }
 .g-node.removed .g-label { text-decoration: line-through; opacity: .7; }
 .g-glyph { fill: #fff; font: 600 18px var(--sans); pointer-events: none; }
-.g-label { fill: var(--g-label); font: 500 14px var(--sans); pointer-events: none; }
-.g-node.focus .g-label { font: 700 17px var(--serif); fill: var(--lime); }
+.g-label { fill: var(--g-label); font: 500 21px var(--sans); pointer-events: none; }
+.g-node.focus .g-label { font: 700 26px var(--serif); fill: var(--lime); }
 .g-node.lit:not(.focus):not(.removed) .g-label { fill: var(--lime); }
 .g-label-bg { fill: var(--g-label-bg); stroke: #2a2f27; pointer-events: none; }
 #flavorGraph:has(.g-node.focus) .g-node:not(.lit) { opacity: .7; }
@@ -377,17 +377,21 @@ button, .drop, .sample, .alt { -webkit-tap-highlight-color: transparent; touch-a
 .grp-fat { fill: var(--grp-fat); background: var(--grp-fat); }
 .grp-fruit { fill: var(--grp-fruit); background: var(--grp-fruit); }
 
-.viz-controls { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 6px; }
+.viz-controls { position: absolute; right: 10px; top: 10px; display: flex; gap: 6px; }
 .viz-controls button {
   width: 32px; height: 32px; border-radius: 50%; border: 1px solid #2f342b; background: #1a1d18; color: var(--g-label);
   font: 500 16px var(--sans); cursor: pointer;
 }
 .viz-controls button:hover { border-color: var(--lime); }
-.viz-legend { position: absolute; left: 12px; top: 10px; display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: #b8c0b2; max-width: 70%; }
+.viz-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: #b8c0b2; padding: 8px 12px 10px; border-top: 1px solid #23271f; min-height: 0; }
+.viz-legend:empty { display: none; }
 .viz-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .viz-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 @media (max-width: 560px) {
   #flavorGraph, .viz-wrap #flavorMap { aspect-ratio: 1 / 1; }
-  .g-label { font-size: 17px; }
-  .viz-legend { font-size: 10.5px; max-width: 90%; }
+  .g-label { font-size: 24px; }
+  .viz-legend { font-size: 10.5px; }
 }
+
+.viz-wrap #flavorMap .why-dot { fill: var(--amber); }
+.viz-wrap #flavorMap .why-label { fill: var(--amber); }

@@ -389,7 +389,7 @@ function drawGraph(r, sel) {
     const rad = n.id === focusNew ? 26 : n.kind === "new" ? 19 : n.kind === "removed" ? 15 : 16;
     g.append(svgEl("circle", { r: rad, class: `g-dot grp-${n.group}` }));
     if (n.kind === "new") g.append(svgEl("text", { class: "g-glyph", "text-anchor": "middle", dy: 5 }, "+"));
-    const label = svgEl("text", { class: "g-label", "text-anchor": "middle", y: rad + 20 }, n.label);
+    const label = svgEl("text", { class: "g-label", "text-anchor": "middle", y: rad + 27 }, n.label);
     const bg = svgEl("rect", { class: "g-label-bg", rx: 6 });
     g.append(bg, label);
     gN.append(g);
@@ -397,6 +397,10 @@ function drawGraph(r, sel) {
     bg.setAttribute("x", bb.x - 7); bg.setAttribute("y", bb.y - 3);
     bg.setAttribute("width", bb.width + 14); bg.setAttribute("height", bb.height + 6);
     n.r = rad;
+    // collision box covers the circle and its label tag
+    n.bw = Math.max(rad * 2, bb.width + 14) + 12;
+    n.top = rad + 6;                       // box extends this far above the node centre
+    n.bot = bb.y + bb.height + 3 + 8;      // and this far below (bottom of the label tag + margin)
     // drag to rearrange
     g.addEventListener("pointerdown", (ev) => {
       ev.preventDefault();
@@ -422,11 +426,9 @@ function drawGraph(r, sel) {
         const b = nodes[j];
         let dx = b.x - a.x, dy = b.y - a.y, d2 = dx * dx + dy * dy + 0.01, d = Math.sqrt(d2);
         const f = (34000 / d2) * heat;
-        const minD = a.r + b.r + 70;                 // keep labels from colliding
-        const push = d < minD ? (minD - d) * 0.5 : 0;
         dx /= d; dy /= d;
-        a.vx -= dx * (f + push); a.vy -= dy * (f + push);
-        b.vx += dx * (f + push); b.vy += dy * (f + push);
+        a.vx -= dx * f; a.vy -= dy * f;
+        b.vx += dx * f; b.vy += dy * f;
       }
     }
     for (const e of edges) {
@@ -438,10 +440,38 @@ function drawGraph(r, sel) {
       n.vx += (W / 2 - n.x) * 0.0008 * heat; n.vy += (H / 2 - n.y) * 0.004 * heat;
       n.vx *= 0.55; n.vy *= 0.55;
       if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = n.vy = 0; continue; }
-      n.x = Math.min(W - 50, Math.max(50, n.x + n.vx));
-      n.y = Math.min(H - 40, Math.max(40, n.y + n.vy));
+      n.x += n.vx; n.y += n.vy;
     }
     heat *= 0.985;
+    collide();
+  }
+  // Push apart any two node+label boxes that overlap (moves positions directly).
+  function collide() {
+    for (let pass = 0; pass < 2; pass++) {
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i], b = nodes[j];
+          const ac = a.y + (a.bot - a.top) / 2, bc = b.y + (b.bot - b.top) / 2;
+          const ox = (a.bw + b.bw) / 2 - Math.abs(b.x - a.x);
+          const oy = (a.top + a.bot + b.top + b.bot) / 2 - Math.abs(bc - ac);
+          if (ox <= 0 || oy <= 0) continue;
+          const aFix = a.fx != null, bFix = b.fx != null;
+          const share = aFix ? [0, 1] : bFix ? [1, 0] : [0.5, 0.5];
+          if (ox < oy) {
+            const sgn = b.x >= a.x ? 1 : -1;
+            a.x -= sgn * ox * share[0]; b.x += sgn * ox * share[1];
+          } else {
+            const sgn = bc >= ac ? 1 : -1;
+            a.y -= sgn * oy * share[0]; b.y += sgn * oy * share[1];
+          }
+        }
+      }
+      for (const n of nodes) {
+        if (n.fx != null) continue;
+        n.x = Math.min(W - n.bw / 2, Math.max(n.bw / 2, n.x));
+        n.y = Math.min(H - n.bot, Math.max(n.top, n.y));
+      }
+    }
   }
   function paint() {
     edges.forEach((e, i) => {
@@ -457,10 +487,11 @@ function drawGraph(r, sel) {
       for (let i = 0; i < 3; i++) step();
       paint();
       if (heat > 0.02) drawGraph._raf = requestAnimationFrame(tick);
+      else { for (let i = 0; i < 40; i++) collide(); paint(); }   // final clean-up: no overlaps
     };
     tick();
   }
-  if (reduce) { while (heat > 0.02) step(); paint(); } else loop();
+  if (reduce) { while (heat > 0.02) step(); for (let i = 0; i < 40; i++) collide(); paint(); } else loop();
 
   // legend: only groups present
   const groups = [...new Set(nodes.map((n) => n.group))];
@@ -475,6 +506,39 @@ function writeWhy(r, sel) {
   const list = why.length > 1 ? `${why.slice(0, -1).join(", ")} and ${why[why.length - 1]}` : why.join("");
   $("#whyText").innerHTML = `<span class="to-word">${esc(pretty(s.to))}</span> replaces ${esc(s.from)} because Epicure links it closely with ${list}, which are already in your dish.${
     r.cuisine_lock && r.cuisine?.[0] ? ` It also leans ${esc(pretty(r.cuisine[0][0]))}, like the rest of the dish.` : ""}`;
+}
+
+// Greedy label placement: try spots around each point, keep the first that is free.
+// Returns the list of occupied boxes (so later labels can avoid them).
+function placeLabels(g, reqs, k, occupied = [], vb = null, opts = {}) {
+  const pad = 3 * k;
+  const hit = (a, b) => a.x0 < b.x1 + pad && a.x1 > b.x0 - pad && a.y0 < b.y1 + pad && a.y1 > b.y0 - pad;
+  const inView = (b) => !vb || (b.x0 >= vb[0] && b.y0 >= vb[1] && b.x1 <= vb[0] + vb[2] && b.y1 <= vb[1] + vb[3]);
+  for (const q of [...reqs].sort((a, b) => b.pri - a.pri)) {
+    const gap = q.r + 5 * k, s = q.size;
+    const spots = q.center
+      ? [[0, s * 0.35, "middle"], [0, -s * 0.9, "middle"], [0, s * 1.5, "middle"], [0, -s * 2, "middle"],
+         [0, s * 2.6, "middle"], [-s * 3, s * 0.35, "middle"], [s * 3, s * 0.35, "middle"], [0, -s * 3, "middle"], [0, s * 3.6, "middle"]]
+      : [[gap, s * 0.35, "start"], [-gap, s * 0.35, "end"], [0, -gap, "middle"], [0, gap + s * 0.8, "middle"],
+         [gap, -gap * 0.8, "start"], [-gap, -gap * 0.8, "end"], [gap, gap + s * 0.6, "start"], [-gap, gap + s * 0.6, "end"]];
+    let done = false;
+    for (const [dx, dy, anchor] of spots) {
+      const t = svgEl("text", { x: q.x + dx, y: q.y + dy, class: q.cls, "font-size": s, "text-anchor": anchor }, q.text);
+      opts.prepend ? g.prepend(t) : g.append(t);
+      const bb = t.getBBox();
+      const box = { x0: bb.x, y0: bb.y, x1: bb.x + bb.width, y1: bb.y + bb.height };
+      if (inView(box) && !occupied.some((o) => hit(box, o))) { occupied.push(box); done = true; break; }
+      t.remove();
+    }
+    // No free spot: the most important labels still show (on top); the rest stay as hover titles.
+    if (!done && q.pri >= 3) {
+      const t = svgEl("text", { x: q.x + q.r + 5 * k, y: q.y + q.size * 0.35, class: q.cls, "font-size": q.size }, q.text);
+      g.append(t);
+      const bb = t.getBBox();
+      occupied.push({ x0: bb.x, y0: bb.y, x1: bb.x + bb.width, y1: bb.y + bb.height });
+    }
+  }
+  return occupied;
 }
 
 // ---------- flavor map ----------
@@ -533,14 +597,14 @@ async function drawMap(r, sel) {
   svg.append(g);
   // background dots
   for (const p of data.points) g.append(svgEl("circle", { cx: X(p), cy: Y(p), r: 2.4 * k, class: "dot" }));
-  // region labels
-  for (const reg of data.regions)
-    g.append(svgEl("text", { x: X(reg), y: Y(reg), class: "region", "font-size": 30 * k, "text-anchor": "middle" }, reg.name));
-  // dish ingredients
+  // dish ingredient dots (labels are placed later, avoiding collisions)
+  const labelReqs = [];
   for (const p of dish) {
     const w = whyNames.has(p.n);
-    g.append(svgEl("circle", { cx: X(p), cy: Y(p), r: (w ? 6 : 4.5) * k, class: `dish-dot ${w ? "why-dot" : ""}` }));
-    g.append(svgEl("text", { x: X(p) + 9 * k, y: Y(p) + 5 * k, class: `dish-label ${w ? "why-label" : ""}`, "font-size": (w ? 17 : 14) * k }, pretty(p.n)));
+    const dot = svgEl("circle", { cx: X(p), cy: Y(p), r: (w ? 6 : 4.5) * k, class: `dish-dot ${w ? "why-dot" : ""}` });
+    dot.append(svgEl("title", {}, pretty(p.n)));
+    g.append(dot);
+    labelReqs.push({ x: X(p), y: Y(p), r: (w ? 6 : 4.5) * k, text: pretty(p.n), cls: `dish-label ${w ? "why-label" : ""}`, size: (w ? 17 : 14) * k, pri: w ? 2 : 1 });
   }
   // swap arrows
   const defs = svgEl("defs", {});
@@ -564,9 +628,17 @@ async function drawMap(r, sel) {
     g.append(svgEl("circle", { cx: x1, cy: y1, r: (on ? 7 : 5) * k, class: `from-dot ${on ? "on" : ""}` }));
     g.append(svgEl("circle", { cx: x2, cy: y2, r: (on ? 9 : 6) * k, class: `to-dot ${on ? "on" : ""}` }));
     if (on) {
-      g.append(svgEl("text", { x: x1 + 10 * k, y: y1 - 8 * k, class: "from-label", "font-size": 18 * k }, pretty(o.s.from_epicure)));
-      g.append(svgEl("text", { x: x2 + 12 * k, y: y2 + 6 * k, class: "to-label", "font-size": 22 * k }, pretty(o.s.to)));
+      labelReqs.push({ x: x2, y: y2, r: 9 * k, text: pretty(o.s.to), cls: "to-label", size: 22 * k, pri: 4 });
+      labelReqs.push({ x: x1, y: y1, r: 7 * k, text: pretty(o.s.from_epicure), cls: "from-label", size: 18 * k, pri: 3 });
     }
+  }
+  // Labels: most important first; each takes the first free spot around its dot.
+  const dotBoxes = labelReqs.map((q) => ({ x0: q.x - q.r, y0: q.y - q.r, x1: q.x + q.r, y1: q.y + q.r }));
+  const placed = placeLabels(g, labelReqs, k, dotBoxes, vb);
+  // Region names only where they don't collide with ingredient labels.
+  for (const reg of data.regions) {
+    placeLabels(g, [{ x: X(reg), y: Y(reg), r: 0, text: reg.name, cls: "region", size: 30 * k, pri: 0, center: true }],
+      k, placed, vb, { prepend: true });
   }
 
   writeWhy(r, sel);
