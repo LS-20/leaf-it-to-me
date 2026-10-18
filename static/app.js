@@ -205,7 +205,7 @@ function renderResult(r) {
   const pantryUsed = r.swaps.filter((s) => s.in_pantry).length;
 
   const swaps = r.swaps.length ? r.swaps.map((s, i) => `
-    <div class="swap" style="animation-delay:${i * 70}ms">
+    <div class="swap ${i === 0 ? "selected" : ""}" data-i="${i}" style="animation-delay:${i * 70}ms">
       <div class="swap-main">
         <span class="from">${esc(s.from)}</span><span class="arrow">→</span>
         <span class="to">${esc(pretty(s.to))}</span>
@@ -249,16 +249,136 @@ function renderResult(r) {
       <div class="swaps">${swaps}</div>
       ${impact}
     </div>
+    ${r.swaps.length ? `<div class="card map-card">
+      <div class="row-between"><h3 class="section-title">Why these swaps? <span class="muted small">Epicure's flavor map</span></h3>
+        <button class="link small" id="mapZoom">Show whole map</button></div>
+      <div class="map-wrap"><svg id="flavorMap" role="img" aria-label="Map of ingredients; similar ingredients sit close together"></svg></div>
+      <p class="why" id="whyText"></p>
+      <p class="fineprint">Each dot is one of 1,790 ingredients, placed so that ingredients used in similar recipes sit close together (t-SNE of Epicure embeddings, learned from about 4 million recipes). Swaps are scored on the full 300-dimension embedding, not this 2D picture.</p>
+    </div>` : ""}
     ${nutri || warns ? `<div class="card notes">${nutri}${warns}</div>` : ""}
     <p class="fineprint">CO₂ uses global averages (Poore &amp; Nemecek 2018); data covers ${fmt(b.coverage * 100, 0)}% of this recipe by weight. Driving comparison uses the US EPA estimate of about 0.4 kg CO₂ per mile.</p>`;
 
   el.querySelectorAll(".alt").forEach((btn) =>
-    btn.addEventListener("click", () => { state.overrides[btn.dataset.from] = btn.dataset.to; doRemix(); }));
+    btn.addEventListener("click", (ev) => { ev.stopPropagation(); state.overrides[btn.dataset.from] = btn.dataset.to; doRemix(); }));
+  el.querySelectorAll(".swap[data-i]").forEach((card) =>
+    card.addEventListener("click", () => {
+      el.querySelectorAll(".swap").forEach((c) => c.classList.toggle("selected", c === card));
+      drawMap(r, +card.dataset.i);
+    }));
+  if (r.swaps.length) {
+    $("#mapZoom").addEventListener("click", () => {
+      mapState.zoomed = !mapState.zoomed;
+      $("#mapZoom").textContent = mapState.zoomed ? "Show whole map" : "Zoom to dish";
+      drawMap(r, mapState.selected);
+    });
+    $("#mapZoom").textContent = mapState.zoomed ? "Show whole map" : "Zoom to dish";
+    drawMap(r, 0);
+  }
   renderPantry();
   if (window.innerWidth < 920 && !renderResult._scrolled) {
     renderResult._scrolled = true;
     el.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+}
+
+
+// ---------- flavor map ----------
+const mapState = { data: null, index: null, zoomed: true, selected: 0 };
+async function getMap() {
+  if (!mapState.data) {
+    mapState.data = await api("/api/flavor-map");
+    mapState.index = Object.fromEntries(mapState.data.points.map((p) => [p.n, p]));
+  }
+  return mapState.data;
+}
+const SVGNS = "http://www.w3.org/2000/svg";
+function svgEl(tag, attrs, text) {
+  const n = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+  if (text != null) n.textContent = text;
+  return n;
+}
+
+async function drawMap(r, sel) {
+  const svg = $("#flavorMap");
+  if (!svg) return;
+  const data = await getMap();
+  mapState.selected = sel;
+  const W = 1000, H = 700, P = 30;
+  const X = (p) => P + p.x * (W - 2 * P);
+  const Y = (p) => P + (1 - p.y) * (H - 2 * P);
+  const at = (n) => mapState.index[n];
+
+  // Points we care about
+  const dish = r.dish_epicure.map(at).filter(Boolean);
+  const swaps = r.swaps.map((s, i) => ({ i, s, from: at(s.from_epicure), to: at(s.to) })).filter((o) => o.from && o.to);
+  const cur = swaps.find((o) => o.i === sel);
+  const whyNames = new Set((r.swaps[sel]?.why || []).map((w) => w.name));
+  // Zoom to the story of the selected swap: where it came from, where it went, and why.
+  const focus = cur ? [cur.from, cur.to, ...[...whyNames].map(at).filter(Boolean)] : dish;
+
+  // viewBox: zoom to the dish (padded), or whole map
+  let vb = [0, 0, W, H];
+  if (mapState.zoomed && focus.length) {
+    const xs = focus.map(X), ys = focus.map(Y);
+    let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const pad = 90;
+    x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
+    // keep the map's aspect ratio
+    const w = x1 - x0, h = y1 - y0, ar = W / H;
+    if (w / h > ar) { const nh = w / ar; y0 -= (nh - h) / 2; y1 = y0 + nh; } else { const nw = h * ar; x0 -= (nw - w) / 2; x1 = x0 + nw; }
+    vb = [x0, y0, x1 - x0, y1 - y0];
+  }
+  svg.setAttribute("viewBox", vb.join(" "));
+  const k = vb[2] / W; // scale so dots/labels keep a constant on-screen size
+  svg.replaceChildren();
+
+  const g = svgEl("g", {});
+  svg.append(g);
+  // background dots
+  for (const p of data.points) g.append(svgEl("circle", { cx: X(p), cy: Y(p), r: 2.4 * k, class: "dot" }));
+  // region labels
+  for (const reg of data.regions)
+    g.append(svgEl("text", { x: X(reg), y: Y(reg), class: "region", "font-size": 30 * k, "text-anchor": "middle" }, reg.name));
+  // dish ingredients
+  for (const p of dish) {
+    const w = whyNames.has(p.n);
+    g.append(svgEl("circle", { cx: X(p), cy: Y(p), r: (w ? 6 : 4.5) * k, class: `dish-dot ${w ? "why-dot" : ""}` }));
+    g.append(svgEl("text", { x: X(p) + 9 * k, y: Y(p) + 5 * k, class: `dish-label ${w ? "why-label" : ""}`, "font-size": (w ? 17 : 14) * k }, pretty(p.n)));
+  }
+  // swap arrows
+  const defs = svgEl("defs", {});
+  const mk = svgEl("marker", { id: "arrow", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto-start-reverse" });
+  mk.append(svgEl("path", { d: "M0,0 L10,5 L0,10 z", class: "arrow-head" }));
+  defs.append(mk);
+  svg.prepend(defs);
+  for (const o of swaps) {
+    const on = o.i === sel;
+    const x1 = X(o.from), y1 = Y(o.from), x2 = X(o.to), y2 = Y(o.to);
+    const mx = (x1 + x2) / 2 - (y2 - y1) * 0.2, my = (y1 + y2) / 2 + (x2 - x1) * 0.2;
+    const path = svgEl("path", { d: `M${x1},${y1} Q${mx},${my} ${x2},${y2}`, class: `swap-arrow ${on ? "on" : ""}`,
+      "stroke-width": (on ? 3 : 1.5) * k, "marker-end": "url(#arrow)" });
+    g.append(path);
+    if (on) {
+      const len = path.getTotalLength();
+      path.style.strokeDasharray = len;
+      path.style.strokeDashoffset = len;
+      requestAnimationFrame(() => { path.style.transition = "stroke-dashoffset .9s ease"; path.style.strokeDashoffset = 0; });
+    }
+    g.append(svgEl("circle", { cx: x1, cy: y1, r: (on ? 7 : 5) * k, class: `from-dot ${on ? "on" : ""}` }));
+    g.append(svgEl("circle", { cx: x2, cy: y2, r: (on ? 9 : 6) * k, class: `to-dot ${on ? "on" : ""}` }));
+    if (on) {
+      g.append(svgEl("text", { x: x1 + 10 * k, y: y1 - 8 * k, class: "from-label", "font-size": 18 * k }, pretty(o.s.from_epicure)));
+      g.append(svgEl("text", { x: x2 + 12 * k, y: y2 + 6 * k, class: "to-label", "font-size": 22 * k }, pretty(o.s.to)));
+    }
+  }
+
+  const s = r.swaps[sel];
+  const why = (s.why || []).map((w) => `<strong>${esc(pretty(w.name))}</strong>`);
+  const list = why.length > 1 ? `${why.slice(0, -1).join(", ")} and ${why[why.length - 1]}` : why.join("");
+  $("#whyText").innerHTML = s ? `<span class="to-word">${esc(pretty(s.to))}</span> replaces ${esc(s.from)} because Epicure links it closely with ${list}, which are already in your dish.${
+    r.cuisine_lock && r.cuisine?.[0] ? ` It also leans ${esc(pretty(r.cuisine[0][0]))}, like the rest of the dish.` : ""}` : "";
 }
 
 loadSamples().catch((e) => toast(e.message));

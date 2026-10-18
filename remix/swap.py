@@ -96,7 +96,11 @@ def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=(),
                 a.update(epicure=best["name"], name=best["name"].replace("_", " "),
                          diet=C.diet_status(best["name"]), footprint=per_kg(best["name"]),
                          swapped_from=it["name"])
-        swaps.append({"from": it["name"], "from_epicure": it["epicure"],
+        # Explanation: which of the dish's kept ingredients sit closest to the swap.
+        why = sorted(((k, emb.sim(best["name"], emb.vec(k))) for k in set(keep)),
+                     key=lambda kv: -kv[1])[:3]
+        swaps.append({"why": [{"name": k, "sim": round(v, 3)} for k, v in why],
+                      "from": it["name"], "from_epicure": it["epicure"],
                       "grams": it["grams"], "role": role,
                       "to": best["name"], "alternatives": [c for c in ranked if c["name"] != best["name"]][:4],
                       "user_choice": best is not ranked[0], **best})
@@ -112,6 +116,7 @@ def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=(),
         "title": recipe.get("title", "Your recipe"), "mode": mode, "model": model,
         "cuisine": cuisines[:3], "cuisine_lock": cuisine_lock,
         "pantry_matched": sorted(pantry_set),
+        "dish_epicure": sorted(set(keep)),
         "before": items, "after": after, "swaps": swaps,
         "footprint_before": before_fp, "footprint_after": after_fp,
         "nutrient_flags": [{"nutrient": n, "lost_from": v, "tip": C.NUTRIENT_TIPS.get(n, "")}

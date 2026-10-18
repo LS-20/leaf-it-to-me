@@ -51,6 +51,12 @@ def sample(key: str):
     return adapters.sample(key)
 
 
+@app.get("/api/flavor-map")
+def flavor_map():
+    """2D t-SNE layout of all 1,790 Epicure ingredients (precomputed)."""
+    return FileResponse(ROOT / "data" / "flavor_map.json", media_type="application/json")
+
+
 @app.post("/api/parse/text")
 def parse_text(req: TextRequest):
     try:

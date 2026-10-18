@@ -248,3 +248,28 @@ textarea:focus, input:focus { outline: 2px solid var(--leaf); outline-offset: 1p
 }
 .impact-pct { font: 700 20px var(--serif); color: var(--green); }
 .fineprint { font-size: 12px; color: var(--muted); margin: 0 4px; }
+
+/* ---------- flavor map ---------- */
+.swap { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.swap.selected { border-color: var(--leaf); box-shadow: 0 0 0 1px var(--leaf); }
+.map-wrap { border-radius: 12px; overflow: hidden; background: var(--bg); border: 1px solid var(--line); }
+#flavorMap { display: block; width: 100%; aspect-ratio: 10 / 7; }
+#flavorMap .dot { fill: var(--muted); opacity: .22; }
+#flavorMap .region { fill: var(--muted); opacity: .55; font-family: var(--serif); font-style: italic; }
+#flavorMap .dish-dot { fill: var(--ink); opacity: .75; }
+#flavorMap .dish-label { fill: var(--ink); opacity: .75; font-family: var(--sans); }
+#flavorMap .swap-arrow { fill: none; stroke: var(--muted); opacity: .15; }
+#flavorMap .swap-arrow.on { stroke: var(--leaf); opacity: 1; }
+#flavorMap .arrow-head { fill: var(--leaf); }
+#flavorMap .from-dot { fill: var(--clay); opacity: .5; }
+#flavorMap .from-dot.on { opacity: 1; }
+#flavorMap .to-dot { fill: var(--leaf); opacity: .6; }
+#flavorMap .to-dot.on { opacity: 1; stroke: var(--card); stroke-width: 2px; }
+#flavorMap .from-label { fill: var(--clay); font-family: var(--sans); text-decoration: line-through; }
+#flavorMap .to-label { fill: var(--green); font-family: var(--serif); font-weight: 700; }
+.why { font-size: 15px; line-height: 1.55; margin: 12px 2px 6px; }
+.why .to-word { font-family: var(--serif); font-weight: 700; color: var(--green); }
+.link.small { font-size: 13px; padding: 0; }
+#flavorMap .why-dot { fill: var(--amber); opacity: 1; }
+#flavorMap .why-label { fill: var(--amber); opacity: 1; font-weight: 600; }
+.why strong { color: var(--amber); }
