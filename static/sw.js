@@ -1,6 +1,6 @@
 // Service worker: keeps the app shell and demo data available offline.
-const CACHE = "remix-v1";
-const SHELL = ["/", "/static/style.css", "/static/app.js", "/static/manifest.webmanifest",
+const CACHE = "remix-v2";
+const SHELL = ["/", "/static/style.css", "/static/app.js", "/static/sprites.js", "/static/manifest.webmanifest",
   "/static/icons/icon-192.png", "/api/samples", "/api/flavor-map", "/api/benchmark"];
 
 self.addEventListener("install", (e) => {

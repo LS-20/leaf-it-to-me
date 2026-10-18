@@ -8,20 +8,20 @@
 <link rel="icon" href="/static/icons/favicon-32.png">
 <link rel="manifest" href="/static/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
-<meta name="theme-color" content="#2f6b45">
+<meta name="theme-color" content="#fff1dc">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Remix">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <header class="top">
   <div class="brand">
-    <img class="logo" src="/static/icons/icon-192.png" alt="" width="40" height="40">
+    <span class="logo" id="logo"></span>
     <div>
       <h1>Recipe Remix</h1>
       <p class="tag">Same dish, lighter footprint, still itself.</p>
@@ -52,7 +52,7 @@
 
       <div class="tabpane hidden" id="tab-photo">
         <label class="drop" for="recipePhoto">
-          <span class="drop-icon" aria-hidden="true">📷</span>
+          <span class="drop-icon" data-sprite="camera"></span>
           <span><strong>Snap or upload</strong> a recipe card or cookbook page</span>
           <input type="file" id="recipePhoto" accept="image/*" capture="environment" hidden>
         </label>
@@ -73,7 +73,7 @@
       <div class="step-head"><span class="num">2</span><h2>Your pantry <span class="opt">optional</span></h2></div>
       <p class="muted small">Show us your shelf. Swaps you already own get ranked first, so you buy less and waste less.</p>
       <label class="drop compact" for="pantryPhoto">
-        <span class="drop-icon" aria-hidden="true">🥫</span>
+        <span class="drop-icon" data-sprite="can"></span>
         <span><strong>Snap your pantry</strong> or fridge</span>
         <input type="file" id="pantryPhoto" accept="image/*" capture="environment" hidden>
       </label>
@@ -113,7 +113,7 @@
   <!-- ============ RESULTS COLUMN ============ -->
   <section class="col results" aria-live="polite" aria-label="Results">
     <div class="card empty" id="emptyState">
-      <div class="empty-art" aria-hidden="true">🍛 → 🌱</div>
+      <div class="empty-art"><span data-sprite="curry" data-size="72"></span><span class="arrow-px">→</span><span data-sprite="sprout" data-size="72"></span></div>
       <h2>Pick a dish to begin</h2>
       <p class="muted">We'll find plant-based swaps that fit its cuisine, show how much CO₂ you save, and flag anything to watch.</p>
     </div>
@@ -131,6 +131,7 @@
 <div class="toast hidden" id="toast" role="status"></div>
 <div class="loading hidden" id="loading"><div class="spinner"></div><span id="loadingText">Working…</span></div>
 
+<script src="/static/sprites.js"></script>
 <script src="/static/app.js"></script>
 <script>
   if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));

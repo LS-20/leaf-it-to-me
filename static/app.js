@@ -11,7 +11,13 @@ const state = {
   hasResult: false,
 };
 
-const EMOJI = { butter_chicken: "🍛", beef_tacos: "🌮", bolognese: "🍝", mapo_tofu: "🥢" };
+const SAMPLE_SPRITE = { butter_chicken: "curry", beef_tacos: "taco", bolognese: "pasta", mapo_tofu: "bowl" };
+// Fill every [data-sprite] placeholder with its pixel sprite.
+function paintSprites(root = document) {
+  root.querySelectorAll("[data-sprite]").forEach((el) => { el.innerHTML = sprite(el.dataset.sprite, +(el.dataset.size || 36)); });
+}
+$("#logo").innerHTML = sprite("sprout", 44, "Recipe Remix");
+paintSprites();
 
 // ---------- helpers ----------
 function esc(s) {
@@ -54,7 +60,7 @@ async function loadSamples() {
   const list = await api("/api/samples");
   $("#samples").innerHTML = list.map((s) => `
     <button class="sample" data-key="${esc(s.key)}">
-      <span class="emoji">${EMOJI[s.key] || "🍽️"}</span>${esc(s.title)}
+      <span class="emoji">${sprite(SAMPLE_SPRITE[s.key] || "curry", 40)}</span>${esc(s.title)}
     </button>`).join("");
   document.querySelectorAll(".sample").forEach((b) =>
     b.addEventListener("click", async () => {
@@ -234,7 +240,7 @@ function renderResult(r) {
       </div>
     </li>`;
   }).join("");
-  const swaps = `${r.swaps.length ? "" : `<div class="note ok">This dish already fits a ${esc(r.mode)} diet. Nothing to swap.</div>`}
+  const swaps = `${r.swaps.length ? "" : `<div class="note ok">This dish already fits a ${esc(r.mode)} diet. Nothing to swap! ${sprite("sparkle", 18)}</div>`}
     <ol class="recipe">${lines}</ol>`;
 
   const impact = saved > 0.05 ? `
