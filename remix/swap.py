@@ -14,8 +14,8 @@ CUISINE_WEIGHT = 0.5  # share of the score from the detected cuisine pole
 
 def needs_swap(name, mode):
     status = C.diet_status(name)
-    if mode == "flexitarian":
-        return name in C.RUMINANT
+    if C.allowed(name, mode):
+        return False
     if mode == "vegan" and status == C.CHECK and C.role_of(name):
         return True  # e.g. cheddar: never vegan, whatever the rennet
     return status in (C.ANIMAL, C.VEGETARIAN) and status not in C.ALLOWED[mode]
@@ -25,9 +25,14 @@ def rank_swaps(original, context_vec, cuisine_vec, mode, emb, pantry=()):
     role = C.role_of(original)
     orig_f = per_kg(original)
     out = []
-    for cand in C.CANDIDATES.get(role, []):
-        if cand not in emb or C.diet_status(cand) not in C.ALLOWED[mode]:
+    cands = list(C.CANDIDATES.get(role, []))
+    if mode == "pescetarian" and role in ("meat", "seafood"):
+        cands += C.SEAFOOD_SWAPS
+    for cand in cands:
+        if cand == original or cand not in emb or not C.allowed(cand, mode):
             continue
+        if cand in C.SEAFOOD and per_kg(cand) is None:
+            continue  # no footprint data: don't guess
         f = per_kg(cand)
         if orig_f and f and f["ghg"] > orig_f["ghg"] * (1 - MIN_CUT):
             continue  # not a big enough footprint win (e.g. paneer vs chicken)
@@ -78,6 +83,17 @@ def build_graph(emb, after, swaps, k=3, min_w=0.35):
     return {"nodes": nodes, "edges": out}
 
 
+def alternatives(ranked, best, mode, n=4):
+    """Next-best swaps. In pescetarian mode, always show the best seafood option
+    (if one passed the footprint filter), since it would rarely make the top few."""
+    alts = [c for c in ranked if c["name"] != best["name"]]
+    if mode == "pescetarian":
+        fish = next((c for c in alts if c["name"] in C.SEAFOOD), None)
+        if fish:  # lead with it so it's visible
+            alts = [fish] + [c for c in alts if c is not fish]
+    return alts[:n]
+
+
 def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=(),
           overrides=None):
     """pantry: free-text names the user owns. overrides: {original_name: chosen_swap}."""
@@ -124,6 +140,8 @@ def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=(),
             best = next((c for c in ranked if c["name"] == chosen), best)
         role = C.role_of(it["epicure"])
         for n in C.NUTRIENT_FLAGS.get(role, []):
+            if best["name"] in C.SEAFOOD and n in ("vitamin B12", "zinc", "omega-3", "iodine"):
+                continue  # fish and shellfish still supply these
             nutrients.setdefault(n, []).append(it["name"])
         for a in after:
             if a["epicure"] == it["epicure"] and a["name"] == it["name"]:
@@ -136,7 +154,7 @@ def remix(recipe, mode="vegan", model="core", cuisine_lock=True, pantry=(),
         swaps.append({"why": [{"name": k, "sim": round(v, 3)} for k, v in why],
                       "from": it["name"], "from_epicure": it["epicure"],
                       "grams": it["grams"], "role": role,
-                      "to": best["name"], "alternatives": [c for c in ranked if c["name"] != best["name"]][:4],
+                      "to": best["name"], "alternatives": alternatives(ranked, best, mode),
                       "user_choice": best is not ranked[0], **best})
 
     for a in after:

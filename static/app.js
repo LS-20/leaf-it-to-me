@@ -229,7 +229,7 @@ function renderResult(r) {
   const swapByFrom = new Map(r.swaps.map((s, i) => [s.from, { s, i }]));
   const lines = r.before.map((it, k) => {
     const hit = swapByFrom.get(it.name);
-    const check = r.after[k]?.diet === "check" && r.mode !== "flexitarian";
+    const check = r.after[k]?.diet === "check" && r.mode !== "none";
     if (!hit) {
       return `<li class="line"><span class="qty">${fmt(it.grams, 0)} g</span>
         <span class="ing">${esc(it.name)}</span>${check ? '<span class="pill warn-tag" title="Processed item: may hide animal ingredients">check label</span>' : ""}</li>`;

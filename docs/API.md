@@ -20,7 +20,7 @@ Request:
 {
   "title": "Butter chicken",
   "ingredients": [{"name": "chicken thighs", "grams": 700}, {"name": "heavy cream", "grams": 120}],
-  "mode": "vegan",                 // flexitarian | vegetarian | vegan
+  "mode": "vegan",                 // pescetarian | vegetarian | vegan
   "model": "core",                 // core | cooc | chem
   "cuisine_lock": true,
   "pantry": ["chickpeas", "coconut milk"],

@@ -33,7 +33,7 @@ python cli.py --photo my_recipe.jpg --mode vegan
 pytest -q                                   # diet-rule tests
 ```
 
-Samples: `butter_chicken`, `beef_tacos`, `bolognese`, `mapo_tofu`. Modes: `flexitarian` (replace beef and lamb only), `vegetarian`, `vegan`. Models: `--model core|cooc|chem`.
+Samples: `butter_chicken`, `beef_tacos`, `bolognese`, `mapo_tofu`. Modes: `pescetarian` (no meat; fish and seafood allowed, and offered as swaps only where they cut CO2e, i.e. for beef and lamb), `vegetarian`, `vegan`. Models: `--model core|cooc|chem`.
 
 ## iPhone app (SwiftUI)
 

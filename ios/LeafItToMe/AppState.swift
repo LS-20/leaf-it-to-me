@@ -25,6 +25,7 @@ final class AppState: ObservableObject {
             benchmark = try await API.benchmark()["core"]
             // Test hook: launch with "-demoSample butter_chicken" to open a dish (optionally "-demoSwap 1").
             let args = ProcessInfo.processInfo.arguments
+            if let m = args.firstIndex(of: "-demoMode"), m + 1 < args.count { mode = args[m + 1] }
             if let i = args.firstIndex(of: "-demoSample"), i + 1 < args.count {
                 await pickSample(args[i + 1])
                 if let j = args.firstIndex(of: "-demoSwap"), j + 1 < args.count, let n = Int(args[j + 1]) { selectedSwap = n }

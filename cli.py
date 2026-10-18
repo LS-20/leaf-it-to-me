@@ -51,7 +51,7 @@ def main():
     g.add_argument("--sample", choices=sorted(SAMPLES))
     g.add_argument("--text")
     g.add_argument("--photo")
-    p.add_argument("--mode", default="vegan", choices=["flexitarian", "vegetarian", "vegan"])
+    p.add_argument("--mode", default="vegan", choices=["pescetarian", "vegetarian", "vegan"])
     p.add_argument("--model", default="core", choices=["core", "cooc", "chem"])
     p.add_argument("--no-cuisine-lock", action="store_true")
     a = p.parse_args()

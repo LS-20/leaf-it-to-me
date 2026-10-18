@@ -48,7 +48,7 @@ struct ResultView: View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
             Text("\(Int(item.grams)) g").font(.body(12)).foregroundStyle(Color.muted).frame(width: 52, alignment: .trailing)
             Text(item.name).font(.body(15)).foregroundStyle(Color.ink)
-            if item.diet == "check" && result.mode != "flexitarian" {
+            if item.diet == "check" {
                 Text("check label").font(.pixel(10)).foregroundStyle(Color.coral)
                     .padding(.horizontal, 6).padding(.vertical, 2)
                     .background(RoundedRectangle(cornerRadius: 5).fill(Color.coralSoft))

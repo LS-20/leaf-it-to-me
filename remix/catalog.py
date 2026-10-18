@@ -56,9 +56,7 @@ EGG_DAIRY_ONLY = re.compile(r"(pasta|noodle|bread|cake|cookie|pastry|chocolate)"
 
 def check_concerns(name: str, mode: str) -> bool:
     """For a CHECK item: could it break this diet? (Used only for warnings.)"""
-    if mode == "flexitarian":
-        return False
-    if mode == "vegetarian" and EGG_DAIRY_ONLY.search(name) and not ANIMAL_WORDS.search(name):
+    if mode in ("vegetarian", "pescetarian") and EGG_DAIRY_ONLY.search(name) and not ANIMAL_WORDS.search(name):
         return False
     return True
 
@@ -80,10 +78,22 @@ def diet_status(name: str) -> str:
 ALLOWED = {
     "vegan": {VEGAN},
     "vegetarian": {VEGAN, VEGETARIAN},
-    "flexitarian": {VEGAN, VEGETARIAN, ANIMAL},
+    "pescetarian": {VEGAN, VEGETARIAN},   # plus the seafood items below
 }
-RUMINANT = {"beef", "lamb", "mutton", "goat", "veal", "venison",
-            "beef_broth", "beef_stock"}
+# Fish and seafood (and sauces made from them) that pescetarians eat.
+SEAFOOD = {"fish", "salmon", "tuna", "cod", "tilapia", "trout", "sardine", "anchovy",
+           "mackerel", "halibut", "haddock", "catfish", "sea_bass", "mahi_mahi", "swordfish",
+           "shrimp", "prawn", "crab", "lobster", "scallop", "clam", "mussel", "oyster",
+           "squid", "octopus", "fish_sauce", "oyster_sauce", "shrimp_paste",
+           "worcestershire_sauce", "fish_stock"}
+ANIMAL_ITEMS |= SEAFOOD   # every seafood item is "not vegetarian", whatever its name
+
+
+def allowed(name: str, mode: str) -> bool:
+    """Is this ingredient OK for the diet? (Rule table only; never embeddings.)"""
+    if mode == "pescetarian" and name in SEAFOOD:
+        return True
+    return diet_status(name) in ALLOWED[mode]
 
 # --- Culinary role (decides which replacements are allowed) ---------------
 ROLE = {}
@@ -135,6 +145,10 @@ CANDIDATES = {
     "gelling": ["agar"],
     "umami_sauce": ["soy_sauce", "miso", "mushroom"],
 }
+# Extra protein swaps in pescetarian mode. Only fish/shrimp that we have footprint
+# data for; they still have to pass the "cuts CO2e by 30%" filter.
+SEAFOOD_SWAPS = ["fish", "salmon", "cod", "tilapia", "trout", "tuna", "catfish",
+                 "sea_bass", "mahi_mahi", "shrimp"]
 
 # --- Footprint commodity (Poore & Nemecek 2018 via Our World in Data) -----
 # (commodity, is_proxy). is_proxy=True means "closest category, not exact".
@@ -152,6 +166,7 @@ _m("Pig Meat", ["pork", "bacon", "ham", "sausage", "chorizo", "lard"])
 _m("Poultry Meat", ["chicken", "turkey", "duck"])
 _m("Poultry Meat", ["chicken_broth", "chicken_stock"], proxy=True)
 _m("Fish (farmed)", ["fish", "salmon", "tilapia", "trout", "cod"])
+_m("Fish (farmed)", ["tuna", "catfish", "sea_bass", "mahi_mahi", "haddock", "halibut"], proxy=True)
 _m("Prawns (farmed)", ["shrimp", "prawn"])
 _m("Cheese", ["cheese", "paneer", "parmesan_cheese", "mozzarella_cheese",
               "cheddar_cheese", "feta_cheese", "goat_cheese", "ricotta_cheese",

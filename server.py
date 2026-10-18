@@ -28,7 +28,7 @@ class Ingredient(BaseModel):
 class RemixRequest(BaseModel):
     title: str = "Your recipe"
     ingredients: list[Ingredient] = Field(min_length=1, max_length=60)
-    mode: str = Field("vegan", pattern="^(flexitarian|vegetarian|vegan)$")
+    mode: str = Field("vegan", pattern="^(pescetarian|vegetarian|vegan)$")
     model: str = Field("core", pattern="^(core|cooc|chem)$")
     cuisine_lock: bool = True
     pantry: list[str] = Field(default_factory=list, max_length=100)

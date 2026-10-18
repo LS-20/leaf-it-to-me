@@ -207,7 +207,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 12) {
             stepHead(3, "How plant-forward?", .mint)
             HStack(spacing: 6) {
-                modeButton("flexitarian", "Flexi", "beef & lamb")
+                modeButton("pescetarian", "Pesce", "fish is ok")
                 modeButton("vegetarian", "Veggie", "no meat/fish")
                 modeButton("vegan", "Vegan", "all plants")
             }
