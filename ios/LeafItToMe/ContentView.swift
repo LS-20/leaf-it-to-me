@@ -219,6 +219,29 @@ struct ContentView: View {
             }
             .tint(.leaf)
             .onChange(of: app.cuisineLock) { Task { await app.remixIfReady() } }
+            DisclosureGroup {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 6) {
+                        ForEach(["core", "cooc", "chem"], id: \.self) { m in
+                            Button { app.model = m; Task { await app.remixIfReady() } } label: {
+                                Text(m.capitalized).font(.pixel(13)).foregroundStyle(Color.ink)
+                                    .frame(maxWidth: .infinity).padding(.vertical, 7)
+                            }
+                            .buttonStyle(PressStyle(fill: app.model == m ? .mint : .card, radius: 9))
+                        }
+                    }
+                    ForEach(modelNotes, id: \.0) { id, title, text in
+                        (Text(title).font(.pixel(11)) + Text(text).font(.body(11)))
+                            .foregroundStyle(app.model == id ? Color.ink : Color.muted)
+                            .padding(6).frame(maxWidth: .infinity, alignment: .leading)
+                            .background(RoundedRectangle(cornerRadius: 8).fill(app.model == id ? Color.greenSoft : .clear))
+                    }
+                }
+                .padding(.top, 8)
+            } label: {
+                Text("Model settings").font(.pixel(13)).foregroundStyle(Color.muted)
+            }
+            .tint(Color.muted)
             Button { Task { await app.remix() } } label: {
                 Text("Remix it →").font(.pixel(20)).foregroundStyle(Color.ink).frame(maxWidth: .infinity).padding(14)
             }
@@ -247,6 +270,12 @@ struct ContentView: View {
         Text("Swaps are plausible pairings from ingredient co-occurrence and flavor chemistry, not taste-tested. Footprints are global averages (Poore & Nemecek 2018). Nutrition notes are not medical advice. Built with Epicure (Radzikowski & Chen, KAIKAKU.AI, CC-BY-4.0) and Gemini.")
             .font(.body(11)).foregroundStyle(Color.muted)
     }
+
+    private let modelNotes: [(String, String, String)] = [
+        ("core", "Core (default): ", "blends which ingredients appear together in recipes with which share flavor compounds. Picks the traditional swap 81% of the time in our test."),
+        ("cooc", "Cooc: ", "recipe co-occurrence only, i.e. what cooks actually put together. 74% in our test."),
+        ("chem", "Chem: ", "flavor chemistry only, i.e. ingredients that share aroma compounds. 64%; expect more surprising pairings."),
+    ]
 
     // MARK: small pieces
     private func stepHead(_ n: Int, _ title: String, _ color: Color) -> some View {

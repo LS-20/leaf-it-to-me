@@ -194,6 +194,12 @@ function segmented(sel, attr, key) {
 }
 segmented("#modeSeg", "mode", "mode");
 segmented("#modelSeg", "model", "model");
+// Highlight the note for the chosen Epicure model.
+function showModelNote() {
+  document.querySelectorAll("#modelNotes li").forEach((li) => li.classList.toggle("on", li.dataset.model === state.model));
+}
+document.querySelectorAll("#modelSeg button").forEach((b) => b.addEventListener("click", showModelNote));
+showModelNote();
 $("#cuisineLock").addEventListener("change", (e) => { state.cuisineLock = e.target.checked; rerun(); });
 $("#remixBtn").addEventListener("click", doRemix);
 function rerun() { if (state.hasResult) doRemix(); }

@@ -102,6 +102,11 @@
             <button data-model="chem" title="Shared flavor compounds">Chem</button>
           </div>
         </div>
+        <ul class="model-notes" id="modelNotes">
+          <li data-model="core"><strong>Core</strong> (default): blends which ingredients appear together in recipes with which share flavor compounds. Picks the traditional swap 81% of the time in our test.</li>
+          <li data-model="cooc"><strong>Cooc</strong>: recipe co-occurrence only, i.e. what cooks actually put together. 74% in our test.</li>
+          <li data-model="chem"><strong>Chem</strong>: flavor chemistry only, i.e. ingredients that share aroma compounds (FlavorDB). 64%; expect more surprising pairings.</li>
+        </ul>
         <label class="adv-row toggle">
           <span>Cuisine lock <small class="muted">keep swaps inside the dish's cuisine</small></span>
           <input type="checkbox" id="cuisineLock" checked>
