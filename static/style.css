@@ -287,3 +287,32 @@ textarea:focus, input:focus { outline: 2px solid var(--leaf); outline-offset: 1p
 .bench-details ul { padding-left: 4px; list-style: none; columns: 2; column-gap: 20px; }
 .bench-details li { margin: 3px 0; break-inside: avoid; }
 @media (max-width: 560px) { .bench-row { grid-template-columns: 120px 1fr 40px; font-size: 13px; } .bench-details ul { columns: 1; } }
+
+/* ---------- recipe-style result ---------- */
+.recipe-kicker { margin: 0 0 6px; font-size: 13px; color: var(--muted); }
+.recipe { list-style: none; margin: 0; padding: 0; }
+.recipe .line {
+  display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: baseline;
+  padding: 9px 4px; border-bottom: 1px dashed var(--line); font-size: 15px;
+}
+.recipe .line:last-child { border-bottom: 0; }
+.recipe .qty { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
+.recipe .ing { color: var(--ink); }
+.recipe .line.swap {
+  background: var(--green-soft); border: 0; border-radius: 12px; margin: 6px 0; padding: 12px 10px;
+  border-left: 3px solid transparent; box-shadow: none;
+}
+.recipe .line.swap.selected { border-left-color: var(--green); box-shadow: none; }
+.recipe .swap-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.recipe .swap-main .from { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--clay); text-decoration-thickness: 2px; }
+.recipe .swap-main .to { font-family: var(--serif); font-weight: 700; font-size: 20px; color: var(--green); }
+.recipe .swap-meta { margin-top: 6px; }
+.recipe .alts { margin-top: 8px; }
+.see-why { color: var(--green); font-weight: 600; opacity: 0; transition: opacity .15s; }
+.line.swap:hover .see-why, .line.swap.selected .see-why { opacity: 1; }
+.tag {
+  font: 600 11px var(--sans); letter-spacing: .02em; text-transform: uppercase; padding: 2px 7px;
+  border-radius: 5px; background: var(--bg); color: var(--muted); align-self: center;
+}
+.tag.pantry-tag { background: var(--green); color: var(--card); }
+.tag.warn-tag { background: var(--clay-soft); color: var(--clay); margin-left: 8px; }

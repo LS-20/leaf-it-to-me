@@ -204,24 +204,38 @@ function renderResult(r) {
   const cuisine = r.cuisine?.[0]?.[0];
   const pantryUsed = r.swaps.filter((s) => s.in_pantry).length;
 
-  const swaps = r.swaps.length ? r.swaps.map((s, i) => `
-    <div class="swap ${i === 0 ? "selected" : ""}" data-i="${i}" style="animation-delay:${i * 70}ms">
-      <div class="swap-main">
-        <span class="from">${esc(s.from)}</span><span class="arrow">→</span>
-        <span class="to">${esc(pretty(s.to))}</span>
-        <span class="grams">${fmt(s.grams, 0)} g</span>
+  // The result is the recipe itself: every ingredient line, with swapped lines rewritten.
+  const swapByFrom = new Map(r.swaps.map((s, i) => [s.from, { s, i }]));
+  const lines = r.before.map((it, k) => {
+    const hit = swapByFrom.get(it.name);
+    const check = r.after[k]?.diet === "check" && r.mode !== "flexitarian";
+    if (!hit) {
+      return `<li class="line"><span class="qty">${fmt(it.grams, 0)} g</span>
+        <span class="ing">${esc(it.name)}</span>${check ? '<span class="tag warn-tag" title="Processed item: may hide animal ingredients">check label</span>' : ""}</li>`;
+    }
+    const { s, i } = hit;
+    return `<li class="line swap ${i === 0 ? "selected" : ""}" data-i="${i}" style="animation-delay:${i * 80}ms">
+      <span class="qty">${fmt(s.grams, 0)} g</span>
+      <div class="swap-body">
+        <div class="swap-main">
+          <span class="from">${esc(s.from)}</span>
+          <span class="to">${esc(pretty(s.to))}</span>
+          ${s.in_pantry ? '<span class="tag pantry-tag">in your pantry</span>' : ""}
+          ${s.user_choice ? '<span class="tag">your pick</span>' : ""}
+        </div>
+        <div class="swap-meta">
+          <span class="meter" title="How well it fits the rest of the dish">dish fit <span class="m"><i style="width:${Math.max(0, s.fit) * 100}%"></i></span></span>
+          ${r.cuisine_lock && cuisine ? `<span class="meter" title="How well it fits ${esc(pretty(cuisine))} cooking">${esc(pretty(cuisine))} <span class="m"><i style="width:${Math.max(0, s.cuisine_fit) * 100}%"></i></span></span>` : ""}
+          <span class="see-why">why? →</span>
+        </div>
+        ${s.alternatives.length ? `<div class="alts">or
+          ${s.alternatives.map((alt) => `<button class="alt ${alt.in_pantry ? "pantry" : ""}" data-from="${esc(s.from)}" data-to="${esc(alt.name)}">${alt.in_pantry ? "✓ " : ""}${esc(pretty(alt.name))}</button>`).join("")}
+        </div>` : ""}
       </div>
-      <div class="swap-meta">
-        ${s.in_pantry ? '<span class="badge pantry">✓ in your pantry</span>' : ""}
-        ${s.user_choice ? '<span class="badge">your pick</span>' : ""}
-        <span class="meter" title="How well it fits the rest of the dish">dish fit <span class="m"><i style="width:${Math.max(0, s.fit) * 100}%"></i></span></span>
-        ${r.cuisine_lock && cuisine ? `<span class="meter" title="How well it fits ${esc(pretty(cuisine))} cooking">${esc(pretty(cuisine))} fit <span class="m"><i style="width:${Math.max(0, s.cuisine_fit) * 100}%"></i></span></span>` : ""}
-      </div>
-      ${s.alternatives.length ? `<div class="alts">Also works:
-        ${s.alternatives.map((alt) => `<button class="alt ${alt.in_pantry ? "pantry" : ""}" data-from="${esc(s.from)}" data-to="${esc(alt.name)}">${alt.in_pantry ? "✓ " : ""}${esc(pretty(alt.name))}</button>`).join("")}
-      </div>` : ""}
-    </div>`).join("")
-    : `<div class="note ok">This dish already fits a ${esc(r.mode)} diet. Nothing to swap. 🎉</div>`;
+    </li>`;
+  }).join("");
+  const swaps = `${r.swaps.length ? "" : `<div class="note ok">This dish already fits a ${esc(r.mode)} diet. Nothing to swap.</div>`}
+    <ol class="recipe">${lines}</ol>`;
 
   const impact = saved > 0.05 ? `
     <div class="impact">
@@ -230,11 +244,11 @@ function renderResult(r) {
     </div>` : "";
 
   const nutri = r.nutrient_flags.length ? `
-    <div class="note nutri"><h3>🥦 Nutrients to watch <span class="muted small">(not medical advice)</span></h3><ul>
+    <div class="note nutri"><h3>Nutrients to watch <span class="muted small">(not medical advice)</span></h3><ul>
       ${r.nutrient_flags.map((n) => `<li><strong>${esc(n.nutrient)}</strong> (was in ${esc(n.lost_from.join(", "))}): ${esc(n.tip)}</li>`).join("")}
     </ul></div>` : "";
   const warns = r.warnings.length ? `
-    <div class="note warn"><h3>⚠️ Check these</h3><ul>
+    <div class="note warn"><h3>Check these</h3><ul>
       ${r.warnings.map((w) => `<li>${esc(w)}</li>`).join("")}
     </ul></div>` : "";
 
@@ -246,6 +260,7 @@ function renderResult(r) {
         <span class="badge">${esc(r.mode)}</span>
         ${pantryUsed ? `<span class="badge pantry">${pantryUsed} swap${pantryUsed > 1 ? "s" : ""} from your pantry</span>` : ""}
       </div>
+      <p class="recipe-kicker">${r.swaps.length} swap${r.swaps.length === 1 ? "" : "s"}, highest impact first. Tap one to see why.</p>
       <div class="swaps">${swaps}</div>
       ${impact}
     </div>
@@ -265,6 +280,9 @@ function renderResult(r) {
     card.addEventListener("click", () => {
       el.querySelectorAll(".swap").forEach((c) => c.classList.toggle("selected", c === card));
       drawMap(r, +card.dataset.i);
+      const map = document.querySelector(".map-card");
+      const box = map?.getBoundingClientRect();
+      if (box && (box.top > window.innerHeight * 0.6 || box.bottom < 0)) map.scrollIntoView({ behavior: "smooth", block: "center" });
     }));
   if (r.swaps.length) {
     $("#mapZoom").addEventListener("click", () => {
