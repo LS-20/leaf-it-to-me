@@ -35,6 +35,17 @@ pytest -q                                   # diet-rule tests
 
 Samples: `butter_chicken`, `beef_tacos`, `bolognese`, `mapo_tofu`. Modes: `flexitarian` (replace beef and lamb only), `vegetarian`, `vegan`. Models: `--model core|cooc|chem`.
 
+## iPhone app (SwiftUI)
+
+`ios/` holds a native SwiftUI app with the same retro look, talking to the same server API (`docs/API.md`): sample dishes, paste or photo a recipe, multi-photo pantry scanning, diet modes, the remixed recipe with tappable alternatives, the animated flavor graph with its "why", nutrition notes and the accuracy card.
+
+```bash
+.venv/bin/uvicorn server:app --port 8000                 # server must be running
+open ios/LeafItToMe.xcodeproj                            # then Run on an iPhone simulator
+```
+
+The simulator reaches the server at `http://127.0.0.1:8000` automatically. On a real iPhone, run the server with `--host 0.0.0.0`, and enter your computer's wifi address in the app's settings (gear icon).
+
 ## How it works
 
 ```mermaid

@@ -22,3 +22,8 @@ models/
 PROJECT_CONTEXT.md
 *.pptx
 *.pdf
+
+# Xcode build output
+ios/build/
+xcuserdata/
+*.xcuserstate
