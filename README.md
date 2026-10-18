@@ -60,6 +60,24 @@ flowchart LR
 5. **Swap ranking.** We don't use raw nearest neighbors, because Epicure's nearest neighbor to chicken is pork (they appear in the same recipes). Instead, each role has a fixed list of plant-based replacements. We rank them by cosine similarity to (a) the average of the dish's *remaining* ingredients and (b) Epicure's cuisine direction for the cuisine it detects (one of seven). Swaps must cut CO2e per kg by at least 30%, so, for example, paneer never replaces chicken, because cheese has a higher footprint.
 6. **Nutrition.** Each removed role flags the nutrients it supplied (B12, iron, zinc, calcium, omega-3, iodine, choline) with a tip. This is not medical advice.
 
+## How accurate is it?
+
+We hand-labelled 31 meat dishes across 7 cuisines with the plant protein their well-known plant-based version uses (chana masala for chicken curry, bean tacos, jackfruit pulled pork, tofu kung pao…). The labels were written **before** running any method. Then we checked how often each method's first pick matches (`python eval/benchmark.py`, Epicure-Core, vegan mode, same diet and footprint filters for every method):
+
+| Method | Hit@1 | Hit@3 |
+|---|---|---|
+| **Recipe Remix** (dish context + cuisine lock) | **81%** | 90% |
+| Recipe Remix without cuisine lock | 74% | 94% |
+| Closest plant protein to the meat itself | 48% | 68% |
+| "Just use tofu" | 32% | 81% |
+| Random | 15% | 40% |
+
+Misses: beef burger (picked kidney bean, not black bean), pulled pork (beans, not jackfruit), goulash (chickpea, not mushroom); lasagna, moussaka and meatballs had the traditional swap at #2–3. Small test set with our own labels: a sanity check, not a published benchmark. The Cooc model without cuisine lock scored 84% hit@1; we kept Core + lock as the default because we chose it before seeing results.
+
+## Flavor map
+
+`scripts/build_flavor_map.py` projects all 1,790 Epicure-Core embeddings to 2D with t-SNE (cosine). The app draws your dish on it, animates each swap, and highlights the three dish ingredients closest to the replacement (cosine in the full 300-d space) as the "why". t-SNE distorts long distances, so the map is for intuition; scoring never uses it.
+
 ## Limits
 
 - Footprints are **global averages** (570 studies, median year 2010), farm to retail. Your local beef or tofu may differ a lot.

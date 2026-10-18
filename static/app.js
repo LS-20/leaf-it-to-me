@@ -381,4 +381,35 @@ async function drawMap(r, sel) {
     r.cuisine_lock && r.cuisine?.[0] ? ` It also leans ${esc(pretty(r.cuisine[0][0]))}, like the rest of the dish.` : ""}` : "";
 }
 
+// ---------- accuracy card ----------
+async function loadBenchmark() {
+  const all = await api("/api/benchmark");
+  const r = all.core;
+  const rows = [
+    ["Recipe Remix", r.summary.ours_cuisine_lock, "ours"],
+    ["Closest match to the meat", r.summary.nearest_to_meat, ""],
+    ['"Just use tofu"', r.summary.always_tofu, ""],
+    ["Random pick", r.summary.random, ""],
+  ];
+  const misses = r.rows.filter((x) => !x.hit1);
+  $("#bench").innerHTML = `
+    <h3 class="section-title">How accurate is it?</h3>
+    <p class="muted small">We wrote down the plant protein used by the well-known plant-based version of ${r.n_dishes} meat dishes across 7 cuisines (chana masala for chicken curry, bean tacos, jackfruit pulled pork…) <em>before</em> testing, then checked how often each method picks it first.</p>
+    <div class="bench-bars">
+      ${rows.map(([label, v, cls]) => `
+        <div class="bench-row ${cls}">
+          <span class="bench-label">${label}</span>
+          <div class="track"><div class="fill" data-w="${v.hit_at_1 * 100}"></div></div>
+          <span class="bench-val">${fmt(v.hit_at_1 * 100, 0)}%</span>
+        </div>`).join("")}
+    </div>
+    <details class="bench-details"><summary>See all ${r.n_dishes} dishes (${misses.length} misses)</summary>
+      <ul>${r.rows.map((x) => `<li>${x.hit1 ? "✓" : "✗"} <strong>${esc(x.dish)}</strong>: picked ${esc(pretty(x.ours_top3[0]))}${x.hit1 ? "" : ` (expected ${esc(x.gold.map(pretty).join(" or "))})`}</li>`).join("")}</ul>
+      <p class="muted small">Small test set, labelled by us. A sanity check, not a published benchmark.</p>
+    </details>`;
+  requestAnimationFrame(() => requestAnimationFrame(() =>
+    document.querySelectorAll("#bench .fill").forEach((f) => { f.style.width = `${f.dataset.w}%`; })));
+}
+
+loadBenchmark().catch(() => $("#bench").classList.add("hidden"));
 loadSamples().catch((e) => toast(e.message));

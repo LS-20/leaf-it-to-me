@@ -57,6 +57,12 @@ def flavor_map():
     return FileResponse(ROOT / "data" / "flavor_map.json", media_type="application/json")
 
 
+@app.get("/api/benchmark")
+def benchmark():
+    """Results of eval/benchmark.py (31 dishes, hand-labelled traditional swaps)."""
+    return FileResponse(ROOT / "data" / "benchmark_results.json", media_type="application/json")
+
+
 @app.post("/api/parse/text")
 def parse_text(req: TextRequest):
     try:

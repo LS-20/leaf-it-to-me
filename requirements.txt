@@ -9,3 +9,4 @@ fastapi==0.143.3
 uvicorn==0.54.0
 python-multipart==0.0.32
 pillow==13.0.0
+scikit-learn==1.9.1  # only for scripts/build_flavor_map.py

@@ -1,0 +1,1619 @@
+{
+ "core": {
+  "model": "core",
+  "n_dishes": 31,
+  "skipped": [],
+  "summary": {
+   "ours_cuisine_lock": {
+    "hit_at_1": 0.806,
+    "hit_at_3": 0.903
+   },
+   "ours_no_lock": {
+    "hit_at_1": 0.742,
+    "hit_at_3": 0.935
+   },
+   "nearest_to_meat": {
+    "hit_at_1": 0.484,
+    "hit_at_3": 0.677
+   },
+   "always_tofu": {
+    "hit_at_1": 0.323,
+    "hit_at_3": 0.806
+   },
+   "random": {
+    "hit_at_1": 0.146,
+    "hit_at_3": 0.398
+   }
+  },
+  "rows": [
+   {
+    "dish": "Butter chicken",
+    "cuisine": "South Asian",
+    "meat": "chicken",
+    "gold": [
+     "chickpea",
+     "chana_dal"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "chana_dal",
+     "lentil"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken tikka masala",
+    "cuisine": "South Asian",
+    "meat": "chicken",
+    "gold": [
+     "chickpea",
+     "chana_dal"
+    ],
+    "ours_top3": [
+     "chana_dal",
+     "chickpea",
+     "lentil"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Lamb rogan josh",
+    "cuisine": "South Asian",
+    "meat": "lamb",
+    "gold": [
+     "chickpea",
+     "chana_dal",
+     "lentil"
+    ],
+    "ours_top3": [
+     "chana_dal",
+     "chickpea",
+     "lentil"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Keema",
+    "cuisine": "South Asian",
+    "meat": "lamb",
+    "gold": [
+     "lentil",
+     "chana_dal",
+     "chickpea"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "chana_dal",
+     "lentil"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "green_pea"
+    ]
+   },
+   {
+    "dish": "Beef tacos",
+    "cuisine": "Latin American",
+    "meat": "beef",
+    "gold": [
+     "pinto_bean",
+     "black_bean"
+    ],
+    "ours_top3": [
+     "pinto_bean",
+     "black_bean",
+     "kidney_bean"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Chili con carne",
+    "cuisine": "Latin American",
+    "meat": "beef",
+    "gold": [
+     "kidney_bean",
+     "black_bean",
+     "pinto_bean"
+    ],
+    "ours_top3": [
+     "pinto_bean",
+     "black_bean",
+     "chickpea"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken burrito",
+    "cuisine": "Latin American",
+    "meat": "chicken",
+    "gold": [
+     "black_bean",
+     "pinto_bean"
+    ],
+    "ours_top3": [
+     "black_bean",
+     "pinto_bean",
+     "kidney_bean"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken enchiladas",
+    "cuisine": "Latin American",
+    "meat": "chicken",
+    "gold": [
+     "black_bean",
+     "pinto_bean"
+    ],
+    "ours_top3": [
+     "pinto_bean",
+     "black_bean",
+     "kidney_bean"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Carnitas",
+    "cuisine": "Latin American",
+    "meat": "pork",
+    "gold": [
+     "jackfruit",
+     "pinto_bean",
+     "black_bean"
+    ],
+    "ours_top3": [
+     "black_bean",
+     "pinto_bean",
+     "kidney_bean"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Mapo tofu with pork",
+    "cuisine": "East Asian",
+    "meat": "pork",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "tempeh"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Kung pao chicken",
+    "cuisine": "East Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef bulgogi",
+    "cuisine": "East Asian",
+    "meat": "beef",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Teriyaki chicken",
+    "cuisine": "East Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Pork dumplings",
+    "cuisine": "East Asian",
+    "meat": "pork",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "tempeh"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "wonton_wrapper"
+    ]
+   },
+   {
+    "dish": "Thai green curry",
+    "cuisine": "Southeast Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "tofu",
+     "tempeh",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "lime_leaf"
+    ]
+   },
+   {
+    "dish": "Pad thai with shrimp",
+    "cuisine": "Southeast Asian",
+    "meat": "shrimp",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "tempeh"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Pho bo",
+    "cuisine": "Southeast Asian",
+    "meat": "beef",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "tempeh"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef rendang",
+    "cuisine": "Southeast Asian",
+    "meat": "beef",
+    "gold": [
+     "jackfruit",
+     "tofu",
+     "tempeh"
+    ],
+    "ours_top3": [
+     "tofu",
+     "tempeh",
+     "edamame"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "lime_leaf"
+    ]
+   },
+   {
+    "dish": "Chicken satay",
+    "cuisine": "Southeast Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu",
+     "tempeh"
+    ],
+    "ours_top3": [
+     "tofu",
+     "chickpea",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Spaghetti bolognese",
+    "cuisine": "Mediterranean",
+    "meat": "beef",
+    "gold": [
+     "lentil",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "mushroom"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Lasagna",
+    "cuisine": "Mediterranean",
+    "meat": "beef",
+    "gold": [
+     "lentil",
+     "mushroom",
+     "eggplant"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "eggplant",
+     "lentil"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Moussaka",
+    "cuisine": "Mediterranean",
+    "meat": "lamb",
+    "gold": [
+     "lentil"
+    ],
+    "ours_top3": [
+     "eggplant",
+     "chickpea",
+     "lentil"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken shawarma",
+    "cuisine": "Mediterranean",
+    "meat": "chicken",
+    "gold": [
+     "chickpea"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Lamb kofta",
+    "cuisine": "Mediterranean",
+    "meat": "lamb",
+    "gold": [
+     "chickpea",
+     "lentil"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "black_bean"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Meatballs in tomato sauce",
+    "cuisine": "Mediterranean",
+    "meat": "beef",
+    "gold": [
+     "lentil",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "eggplant",
+     "lentil"
+    ],
+    "hit1": false,
+    "missing_context": [
+     "breadcrumb"
+    ]
+   },
+   {
+    "dish": "Beef burger",
+    "cuisine": "Western",
+    "meat": "beef",
+    "gold": [
+     "black_bean",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "kidney_bean",
+     "lentil",
+     "chickpea"
+    ],
+    "hit1": false,
+    "missing_context": [
+     "bun"
+    ]
+   },
+   {
+    "dish": "Shepherd's pie",
+    "cuisine": "Western",
+    "meat": "lamb",
+    "gold": [
+     "lentil",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "cauliflower"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "green_pea"
+    ]
+   },
+   {
+    "dish": "Pulled pork",
+    "cuisine": "Western",
+    "meat": "pork",
+    "gold": [
+     "jackfruit"
+    ],
+    "ours_top3": [
+     "pinto_bean",
+     "black_bean",
+     "kidney_bean"
+    ],
+    "hit1": false,
+    "missing_context": [
+     "bun",
+     "coleslaw"
+    ]
+   },
+   {
+    "dish": "Beef stew",
+    "cuisine": "Western",
+    "meat": "beef",
+    "gold": [
+     "mushroom",
+     "lentil"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "cauliflower"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef goulash",
+    "cuisine": "Eastern European",
+    "meat": "beef",
+    "gold": [
+     "mushroom"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "kidney_bean"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef stroganoff",
+    "cuisine": "Eastern European",
+    "meat": "beef",
+    "gold": [
+     "mushroom"
+    ],
+    "ours_top3": [
+     "mushroom",
+     "lentil",
+     "chickpea"
+    ],
+    "hit1": true,
+    "missing_context": []
+   }
+  ]
+ },
+ "cooc": {
+  "model": "cooc",
+  "n_dishes": 31,
+  "skipped": [],
+  "summary": {
+   "ours_cuisine_lock": {
+    "hit_at_1": 0.742,
+    "hit_at_3": 0.903
+   },
+   "ours_no_lock": {
+    "hit_at_1": 0.839,
+    "hit_at_3": 0.935
+   },
+   "nearest_to_meat": {
+    "hit_at_1": 0.484,
+    "hit_at_3": 0.677
+   },
+   "always_tofu": {
+    "hit_at_1": 0.323,
+    "hit_at_3": 0.742
+   },
+   "random": {
+    "hit_at_1": 0.146,
+    "hit_at_3": 0.398
+   }
+  },
+  "rows": [
+   {
+    "dish": "Butter chicken",
+    "cuisine": "South Asian",
+    "meat": "chicken",
+    "gold": [
+     "chickpea",
+     "chana_dal"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "chana_dal"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken tikka masala",
+    "cuisine": "South Asian",
+    "meat": "chicken",
+    "gold": [
+     "chickpea",
+     "chana_dal"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "chana_dal"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Lamb rogan josh",
+    "cuisine": "South Asian",
+    "meat": "lamb",
+    "gold": [
+     "chickpea",
+     "chana_dal",
+     "lentil"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chana_dal",
+     "chickpea"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Keema",
+    "cuisine": "South Asian",
+    "meat": "lamb",
+    "gold": [
+     "lentil",
+     "chana_dal",
+     "chickpea"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "chana_dal"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "green_pea"
+    ]
+   },
+   {
+    "dish": "Beef tacos",
+    "cuisine": "Latin American",
+    "meat": "beef",
+    "gold": [
+     "pinto_bean",
+     "black_bean"
+    ],
+    "ours_top3": [
+     "pinto_bean",
+     "lentil",
+     "chickpea"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Chili con carne",
+    "cuisine": "Latin American",
+    "meat": "beef",
+    "gold": [
+     "kidney_bean",
+     "black_bean",
+     "pinto_bean"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "pinto_bean",
+     "mushroom"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken burrito",
+    "cuisine": "Latin American",
+    "meat": "chicken",
+    "gold": [
+     "black_bean",
+     "pinto_bean"
+    ],
+    "ours_top3": [
+     "pinto_bean",
+     "chickpea",
+     "lentil"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken enchiladas",
+    "cuisine": "Latin American",
+    "meat": "chicken",
+    "gold": [
+     "black_bean",
+     "pinto_bean"
+    ],
+    "ours_top3": [
+     "pinto_bean",
+     "chickpea",
+     "lentil"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Carnitas",
+    "cuisine": "Latin American",
+    "meat": "pork",
+    "gold": [
+     "jackfruit",
+     "pinto_bean",
+     "black_bean"
+    ],
+    "ours_top3": [
+     "lentil",
+     "pinto_bean",
+     "chickpea"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Mapo tofu with pork",
+    "cuisine": "East Asian",
+    "meat": "pork",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Kung pao chicken",
+    "cuisine": "East Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "mushroom"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef bulgogi",
+    "cuisine": "East Asian",
+    "meat": "beef",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "mushroom"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Teriyaki chicken",
+    "cuisine": "East Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "mushroom"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Pork dumplings",
+    "cuisine": "East Asian",
+    "meat": "pork",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "mushroom"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "wonton_wrapper"
+    ]
+   },
+   {
+    "dish": "Thai green curry",
+    "cuisine": "Southeast Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "tofu",
+     "eggplant",
+     "tempeh"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "lime_leaf"
+    ]
+   },
+   {
+    "dish": "Pad thai with shrimp",
+    "cuisine": "Southeast Asian",
+    "meat": "shrimp",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "jackfruit"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Pho bo",
+    "cuisine": "Southeast Asian",
+    "meat": "beef",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "tempeh"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef rendang",
+    "cuisine": "Southeast Asian",
+    "meat": "beef",
+    "gold": [
+     "jackfruit",
+     "tofu",
+     "tempeh"
+    ],
+    "ours_top3": [
+     "tofu",
+     "tempeh",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "lime_leaf"
+    ]
+   },
+   {
+    "dish": "Chicken satay",
+    "cuisine": "Southeast Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu",
+     "tempeh"
+    ],
+    "ours_top3": [
+     "lentil",
+     "cauliflower",
+     "chana_dal"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Spaghetti bolognese",
+    "cuisine": "Mediterranean",
+    "meat": "beef",
+    "gold": [
+     "lentil",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "mushroom",
+     "lentil",
+     "chickpea"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Lasagna",
+    "cuisine": "Mediterranean",
+    "meat": "beef",
+    "gold": [
+     "lentil",
+     "mushroom",
+     "eggplant"
+    ],
+    "ours_top3": [
+     "mushroom",
+     "lentil",
+     "chickpea"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Moussaka",
+    "cuisine": "Mediterranean",
+    "meat": "lamb",
+    "gold": [
+     "lentil"
+    ],
+    "ours_top3": [
+     "eggplant",
+     "mushroom",
+     "chickpea"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken shawarma",
+    "cuisine": "Mediterranean",
+    "meat": "chicken",
+    "gold": [
+     "chickpea"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "cauliflower"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Lamb kofta",
+    "cuisine": "Mediterranean",
+    "meat": "lamb",
+    "gold": [
+     "chickpea",
+     "lentil"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "cauliflower"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Meatballs in tomato sauce",
+    "cuisine": "Mediterranean",
+    "meat": "beef",
+    "gold": [
+     "lentil",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "mushroom",
+     "lentil",
+     "chickpea"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "breadcrumb"
+    ]
+   },
+   {
+    "dish": "Beef burger",
+    "cuisine": "Western",
+    "meat": "beef",
+    "gold": [
+     "black_bean",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "lentil",
+     "mushroom",
+     "pinto_bean"
+    ],
+    "hit1": false,
+    "missing_context": [
+     "bun"
+    ]
+   },
+   {
+    "dish": "Shepherd's pie",
+    "cuisine": "Western",
+    "meat": "lamb",
+    "gold": [
+     "lentil",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "mushroom",
+     "lentil",
+     "chickpea"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "green_pea"
+    ]
+   },
+   {
+    "dish": "Pulled pork",
+    "cuisine": "Western",
+    "meat": "pork",
+    "gold": [
+     "jackfruit"
+    ],
+    "ours_top3": [
+     "pinto_bean",
+     "chickpea",
+     "black_bean"
+    ],
+    "hit1": false,
+    "missing_context": [
+     "bun",
+     "coleslaw"
+    ]
+   },
+   {
+    "dish": "Beef stew",
+    "cuisine": "Western",
+    "meat": "beef",
+    "gold": [
+     "mushroom",
+     "lentil"
+    ],
+    "ours_top3": [
+     "mushroom",
+     "lentil",
+     "cauliflower"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef goulash",
+    "cuisine": "Eastern European",
+    "meat": "beef",
+    "gold": [
+     "mushroom"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "mushroom"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef stroganoff",
+    "cuisine": "Eastern European",
+    "meat": "beef",
+    "gold": [
+     "mushroom"
+    ],
+    "ours_top3": [
+     "mushroom",
+     "cauliflower",
+     "lentil"
+    ],
+    "hit1": true,
+    "missing_context": []
+   }
+  ]
+ },
+ "chem": {
+  "model": "chem",
+  "n_dishes": 31,
+  "skipped": [],
+  "summary": {
+   "ours_cuisine_lock": {
+    "hit_at_1": 0.645,
+    "hit_at_3": 0.806
+   },
+   "ours_no_lock": {
+    "hit_at_1": 0.742,
+    "hit_at_3": 0.871
+   },
+   "nearest_to_meat": {
+    "hit_at_1": 0.387,
+    "hit_at_3": 0.71
+   },
+   "always_tofu": {
+    "hit_at_1": 0.323,
+    "hit_at_3": 0.71
+   },
+   "random": {
+    "hit_at_1": 0.146,
+    "hit_at_3": 0.398
+   }
+  },
+  "rows": [
+   {
+    "dish": "Butter chicken",
+    "cuisine": "South Asian",
+    "meat": "chicken",
+    "gold": [
+     "chickpea",
+     "chana_dal"
+    ],
+    "ours_top3": [
+     "chana_dal",
+     "lentil",
+     "chickpea"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken tikka masala",
+    "cuisine": "South Asian",
+    "meat": "chicken",
+    "gold": [
+     "chickpea",
+     "chana_dal"
+    ],
+    "ours_top3": [
+     "chana_dal",
+     "chickpea",
+     "lentil"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Lamb rogan josh",
+    "cuisine": "South Asian",
+    "meat": "lamb",
+    "gold": [
+     "chickpea",
+     "chana_dal",
+     "lentil"
+    ],
+    "ours_top3": [
+     "chana_dal",
+     "chickpea",
+     "lentil"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Keema",
+    "cuisine": "South Asian",
+    "meat": "lamb",
+    "gold": [
+     "lentil",
+     "chana_dal",
+     "chickpea"
+    ],
+    "ours_top3": [
+     "chana_dal",
+     "chickpea",
+     "lentil"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "green_pea"
+    ]
+   },
+   {
+    "dish": "Beef tacos",
+    "cuisine": "Latin American",
+    "meat": "beef",
+    "gold": [
+     "pinto_bean",
+     "black_bean"
+    ],
+    "ours_top3": [
+     "pinto_bean",
+     "black_bean",
+     "kidney_bean"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Chili con carne",
+    "cuisine": "Latin American",
+    "meat": "beef",
+    "gold": [
+     "kidney_bean",
+     "black_bean",
+     "pinto_bean"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "chana_dal"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken burrito",
+    "cuisine": "Latin American",
+    "meat": "chicken",
+    "gold": [
+     "black_bean",
+     "pinto_bean"
+    ],
+    "ours_top3": [
+     "black_bean",
+     "pinto_bean",
+     "kidney_bean"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken enchiladas",
+    "cuisine": "Latin American",
+    "meat": "chicken",
+    "gold": [
+     "black_bean",
+     "pinto_bean"
+    ],
+    "ours_top3": [
+     "pinto_bean",
+     "black_bean",
+     "kidney_bean"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Carnitas",
+    "cuisine": "Latin American",
+    "meat": "pork",
+    "gold": [
+     "jackfruit",
+     "pinto_bean",
+     "black_bean"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "chana_dal"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Mapo tofu with pork",
+    "cuisine": "East Asian",
+    "meat": "pork",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Kung pao chicken",
+    "cuisine": "East Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef bulgogi",
+    "cuisine": "East Asian",
+    "meat": "beef",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Teriyaki chicken",
+    "cuisine": "East Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "tofu",
+     "cauliflower",
+     "edamame"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Pork dumplings",
+    "cuisine": "East Asian",
+    "meat": "pork",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "tofu",
+     "edamame",
+     "eggplant"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "wonton_wrapper"
+    ]
+   },
+   {
+    "dish": "Thai green curry",
+    "cuisine": "Southeast Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "eggplant",
+     "tempeh",
+     "chana_dal"
+    ],
+    "hit1": false,
+    "missing_context": [
+     "lime_leaf"
+    ]
+   },
+   {
+    "dish": "Pad thai with shrimp",
+    "cuisine": "Southeast Asian",
+    "meat": "shrimp",
+    "gold": [
+     "tofu"
+    ],
+    "ours_top3": [
+     "chana_dal",
+     "tofu",
+     "tempeh"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Pho bo",
+    "cuisine": "Southeast Asian",
+    "meat": "beef",
+    "gold": [
+     "tofu",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "chana_dal",
+     "tempeh",
+     "tofu"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef rendang",
+    "cuisine": "Southeast Asian",
+    "meat": "beef",
+    "gold": [
+     "jackfruit",
+     "tofu",
+     "tempeh"
+    ],
+    "ours_top3": [
+     "tempeh",
+     "chana_dal",
+     "tofu"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "lime_leaf"
+    ]
+   },
+   {
+    "dish": "Chicken satay",
+    "cuisine": "Southeast Asian",
+    "meat": "chicken",
+    "gold": [
+     "tofu",
+     "tempeh"
+    ],
+    "ours_top3": [
+     "tempeh",
+     "tofu",
+     "chana_dal"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Spaghetti bolognese",
+    "cuisine": "Mediterranean",
+    "meat": "beef",
+    "gold": [
+     "lentil",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "kidney_bean"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Lasagna",
+    "cuisine": "Mediterranean",
+    "meat": "beef",
+    "gold": [
+     "lentil",
+     "mushroom",
+     "eggplant"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "eggplant"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Moussaka",
+    "cuisine": "Mediterranean",
+    "meat": "lamb",
+    "gold": [
+     "lentil"
+    ],
+    "ours_top3": [
+     "eggplant",
+     "chickpea",
+     "lentil"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Chicken shawarma",
+    "cuisine": "Mediterranean",
+    "meat": "chicken",
+    "gold": [
+     "chickpea"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "chana_dal"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Lamb kofta",
+    "cuisine": "Mediterranean",
+    "meat": "lamb",
+    "gold": [
+     "chickpea",
+     "lentil"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "chana_dal"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Meatballs in tomato sauce",
+    "cuisine": "Mediterranean",
+    "meat": "beef",
+    "gold": [
+     "lentil",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "chickpea",
+     "lentil",
+     "eggplant"
+    ],
+    "hit1": false,
+    "missing_context": [
+     "breadcrumb"
+    ]
+   },
+   {
+    "dish": "Beef burger",
+    "cuisine": "Western",
+    "meat": "beef",
+    "gold": [
+     "black_bean",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "lentil",
+     "kidney_bean",
+     "chickpea"
+    ],
+    "hit1": false,
+    "missing_context": [
+     "bun"
+    ]
+   },
+   {
+    "dish": "Shepherd's pie",
+    "cuisine": "Western",
+    "meat": "lamb",
+    "gold": [
+     "lentil",
+     "mushroom"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "kidney_bean"
+    ],
+    "hit1": true,
+    "missing_context": [
+     "green_pea"
+    ]
+   },
+   {
+    "dish": "Pulled pork",
+    "cuisine": "Western",
+    "meat": "pork",
+    "gold": [
+     "jackfruit"
+    ],
+    "ours_top3": [
+     "kidney_bean",
+     "pinto_bean",
+     "lentil"
+    ],
+    "hit1": false,
+    "missing_context": [
+     "bun",
+     "coleslaw"
+    ]
+   },
+   {
+    "dish": "Beef stew",
+    "cuisine": "Western",
+    "meat": "beef",
+    "gold": [
+     "mushroom",
+     "lentil"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "chana_dal"
+    ],
+    "hit1": true,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef goulash",
+    "cuisine": "Eastern European",
+    "meat": "beef",
+    "gold": [
+     "mushroom"
+    ],
+    "ours_top3": [
+     "lentil",
+     "chickpea",
+     "kidney_bean"
+    ],
+    "hit1": false,
+    "missing_context": []
+   },
+   {
+    "dish": "Beef stroganoff",
+    "cuisine": "Eastern European",
+    "meat": "beef",
+    "gold": [
+     "mushroom"
+    ],
+    "ours_top3": [
+     "mushroom",
+     "lentil",
+     "chickpea"
+    ],
+    "hit1": true,
+    "missing_context": []
+   }
+  ]
+ }
+}
