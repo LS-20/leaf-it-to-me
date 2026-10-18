@@ -53,7 +53,7 @@ SAMPLES = {
         ],
     },
     "mapo_tofu": {
-        "title": "Mapo tofu",
+        "title": "Mapo tofu (with pork)",
         "ingredients": [
             {"name": "ground pork", "grams": 250},
             {"name": "tofu", "grams": 400},
